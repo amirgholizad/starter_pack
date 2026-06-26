@@ -6,7 +6,14 @@ and assets are large binaries.
 
 ## Onboard a client (one step)
 
-Drop the Google Form CSV export into the `intake/` folder, then ask Claude:
+Drop the Google Form CSV export into the `intake/` folder, then either run the launcher:
+
+```
+scripts/onboard.sh "Business Name"
+```
+
+…which runs intake headlessly, pauses for you to review the brief, then opens the
+interactive design session. Or do it by hand — ask Claude:
 
 > "Run the **intake** agent for *<Business Name>* from the CSV in `intake/`."
 

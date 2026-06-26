@@ -22,13 +22,20 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
 
 ## Procedure
 1. Read `clients/<slug>/brief.md`. Pull out: the **page list** (§3), **design direction**
-   (§4 — vibe adjectives, reference sites + reasons), **brand** (§2 — colors, fonts, logo),
-   and the **per-page content** (§3).
+   (§4 — vibe adjectives, reference/inspiration links + reasons, and the **animations /
+   interactions to emulate**), **brand** (§2 — colors, fonts, logo), and the **per-page
+   content** (§3).
 2. **Publish assets so v0 can reach them.** Run:
    `python scripts/publish-assets.py clients/<slug>/assets <slug>`
    It uploads the images to a public Supabase bucket and prints `filename → URL`. Capture
    those URLs. If it reports a missing `SUPABASE_SERVICE_ROLE_KEY` or no images, don't
    fail — continue with branding described in text only, and note it in your summary.
+2b. **Snapshot the inspiration links** so v0 can see them. For each inspiration link in §4:
+   - if it's already a direct image (e.g. a Dribbble shot `…png`/`…gif`, a Land-book image),
+     use that URL as-is;
+   - otherwise turn the live page into an attachable screenshot URL:
+     `scripts/snap.sh "<inspiration-url>"` → prints a public image URL. Capture it.
+   Keep the client's note about *what* to copy from each reference.
 3. **Create one v0 project for the client** (for visual consistency across pages): call
    `createChat` for the first page with a `projectId`/design-system intent, and reuse the
    same project for subsequent pages. (If the MCP exposes a project/design-system param,
@@ -40,10 +47,18 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
       - the **sections** for that page (hero, features, testimonials, contact, footer, …);
       - **design direction**: vibe adjectives, brand colors (hex), fonts, and the
         reference sites with what the client liked about them;
+      - **inspiration**: "Match the visual style, layout, type and spacing of the attached
+        reference screenshot(s). Specifically copy: <client's note per reference>." (The
+        screenshot is attached in step b.)
+      - **animations**: "Implement these motions with **Framer Motion** (`motion/react`):
+        <the §4 animation notes>. Add tasteful scroll-reveal and hover motion consistent
+        with the reference; keep it smooth and not gratuitous." If §4 lists no animations,
+        still ask for subtle, modern scroll/hover motion fitting the vibe.
       - the page's real **copy** if present in the brief.
-   b. Call `createChat` with that message and `attachments: [{ url }]` for the **logo** plus
-      any images relevant to this page. Enable image generation only if the page needs
-      imagery the client didn't supply.
+   b. Call `createChat` with that message and `attachments: [{ url }]` containing: the
+      **logo**, any page-relevant **client photos**, and the **inspiration screenshot(s)**
+      from step 2b. Enable image generation only if the page needs imagery the client
+      didn't supply.
    c. From the result capture the **chatId**, the **web/demo URL**, and the returned **files**.
    d. Save into `clients/<slug>/design/<page-slug>/`:
       - the returned code files,
@@ -59,6 +74,8 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
 - One page per v0 chat; keep all of a client's chats in one v0 project for a consistent look.
 - Always attach the real **logo**; pass photos as attachments rather than describing them.
 - Everything you write lives under `clients/<slug>/design/`, which is gitignored (client work).
+- If a page's v0 output uses Framer Motion (`motion` / `framer-motion`), record that in the
+  page's `meta.md` so the build step installs the dependency.
 - Never invent brand details — use the brief. Generate imagery only to fill genuine gaps,
   and say so.
 - Touch only this client's folder.

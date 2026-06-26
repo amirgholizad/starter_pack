@@ -35,6 +35,11 @@
   - <url> — <what they like>
 - Sites they dislike (and why):
   - <url> — <what puts them off>
+- Inspiration to emulate (live site / Dribbble / Land-book):
+  - <url> — <what to copy: layout, color, type, spacing, overall feel>
+- Animations / interactions to emulate (a screenshot can't show motion — describe it):
+  - <e.g. hero text staggers/fades up on load, cards lift + shadow on hover, sticky nav
+    shrinks on scroll, sections reveal on scroll, parallax hero image, marquee logo row>
 
 ## 5. Functionality — → build
 - Features needed: <contact form, booking, gallery, ...>
