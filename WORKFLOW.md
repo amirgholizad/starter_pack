@@ -11,6 +11,14 @@ Claude Code builds the real app → Supabase wired in → Vercel deploy → revi
 
 v0 outputs the same stack we build in, so its code is a **reference** to refactor, not the final app (see AGENTS.md).
 
+## Per-client intake (start here)
+
+Each client starts from a filled brief. Drop the Google Form CSV export into the `intake/`
+folder and ask Claude to **run the `intake` agent** for that client — it installs the
+client-privacy `.gitignore` rules, fills `clients/<slug>/brief.md` (derived Supabase schema
++ v0 design direction), and downloads their Drive assets into `clients/<slug>/assets/`.
+See `clients/README.md`. Then feed the brief to v0.
+
 ## One-time setup per clone
 
 1. `cp .env.example .env` and fill in the keys.

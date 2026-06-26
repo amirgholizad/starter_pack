@@ -40,6 +40,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Agents
-AGENTS.md
-CLAUDE.md
+# Local Claude Code settings (AGENTS.md / CLAUDE.md stay tracked — they are the build contract)
+.claude/settings.local.json
+
+# Intake drop-folder: CSV exports hold PII for every submission — never commit them
+/intake/*
+!/intake/README.md
+
+# Client privacy rules are NOT here on purpose — the starter repo tracks
+# clients/ and scripts/. The intake agent appends .gitignore.template on first
+# run so a working clone never commits real client PII. See .gitignore.template.
+
+# Python
+__pycache__/
+*.pyc

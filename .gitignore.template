@@ -1,0 +1,13 @@
+# Client privacy rules.
+#
+# These are NOT active in the starter repo (so it can track clients/_template
+# and clients/README.md). The `intake` agent appends this block to .gitignore on
+# first run, so once you onboard a real client their brief + downloaded assets
+# (which contain PII and large binaries) are never committed.
+#
+# To apply manually:  cat .gitignore.template >> .gitignore
+
+# --- client privacy ---
+/clients/*
+!/clients/_template/
+!/clients/README.md
