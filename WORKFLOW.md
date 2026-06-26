@@ -19,6 +19,15 @@ client-privacy `.gitignore` rules, fills `clients/<slug>/brief.md` (derived Supa
 + v0 design direction), and downloads their Drive assets into `clients/<slug>/assets/`.
 See `clients/README.md`. Then feed the brief to v0.
 
+## Design with v0 (one page at a time)
+
+Once a client's brief is filled, run the **`design` agent** for that client. It publishes
+their assets to a public Supabase bucket (`scripts/publish-assets.py`), then generates each
+page with the v0 MCP — feeding the real logo/photos as attachments and the brief's design
+direction — pausing for your approval per page. Approved pages are saved to
+`clients/<slug>/design/<page>/` (code + v0 URL) and become the reference the build is
+verified against. Needs `SUPABASE_SERVICE_ROLE_KEY` in `.env` for asset publishing.
+
 ## One-time setup per clone
 
 1. `cp .env.example .env` and fill in the keys.
