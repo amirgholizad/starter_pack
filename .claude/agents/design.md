@@ -30,6 +30,9 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
    It uploads the images to a public Supabase bucket and prints `filename → URL`. Capture
    those URLs. If it reports a missing `SUPABASE_SERVICE_ROLE_KEY` or no images, don't
    fail — continue with branding described in text only, and note it in your summary.
+   Then **confirm a logo image is present** in `clients/<slug>/assets/`: if §2 says a logo
+   was provided but none is there (sometimes it arrives as a PDF/screenshot, not an image
+   file), stop and ask the user for the logo file before generating.
 2b. **Snapshot the inspiration links** so v0 can see them. For each inspiration link in §4:
    - if it's already a direct image (e.g. a Dribbble shot `…png`/`…gif`, a Land-book image),
      use that URL as-is;
@@ -44,7 +47,8 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
    a. Compose the v0 prompt:
       - the **Stack** line above;
       - the page name and its purpose (from the brief's goal);
-      - the **sections** for that page (hero, features, testimonials, contact, footer, …);
+      - the **sections** for that page (hero, features, testimonials, contact, footer, …),
+        and a header **nav whose links cover every one of those sections** (don't omit any);
       - **design direction**: vibe adjectives, brand colors (hex), fonts, and the
         reference sites with what the client liked about them;
       - **inspiration**: "Match the visual style, layout, type and spacing of the attached
@@ -59,13 +63,20 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
       **logo**, any page-relevant **client photos**, and the **inspiration screenshot(s)**
       from step 2b. Enable image generation only if the page needs imagery the client
       didn't supply.
-   c. From the result capture the **chatId**, the **web/demo URL**, and the returned **files**.
+   c. **Capture the actual generated code — not the chat text.** Read the `files` from the
+      tool result; if the result only returns a chat/demo URL, call `getChat` with the
+      chatId to fetch the current version's files. Never treat v0's natural-language
+      acknowledgement ("I've added…") as proof the code changed.
    d. Save into `clients/<slug>/design/<page-slug>/`:
-      - the returned code files,
-      - a `meta.md` with the chatId, the v0 web URL, and the exact prompt used.
-   e. Give the user the **v0 web URL** and **pause for review**. Verify the page against
-      the brief (vibe, brand, requested sections). If they want changes, call
-      `sendChatMessage` on the same chatId, re-save the files, and repeat.
+      - the fetched code files (overwrite prior versions),
+      - a `meta.md` with the chatId, the v0 web URL, the exact prompt used, and whether the
+        page uses Framer Motion.
+   e. Give the user the **v0 web URL** and **pause for review**. To iterate, call
+      `sendChatMessage` on the same chatId, then **re-fetch the files (step c) and confirm
+      they actually changed** by diffing against what you last saved. v0 sometimes
+      acknowledges a change without regenerating — if a requested change did NOT land in the
+      code, send one more explicit message; if it still doesn't, **make the edit yourself in
+      the saved files** and tell the user you applied it manually. Re-save after every change.
    f. **Do not start the next page until the current one is approved.**
 5. When all pages are approved, summarize: each page → its v0 URL and saved folder, plus
    any assets that couldn't be published.
@@ -74,8 +85,11 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
 - One page per v0 chat; keep all of a client's chats in one v0 project for a consistent look.
 - Always attach the real **logo**; pass photos as attachments rather than describing them.
 - Everything you write lives under `clients/<slug>/design/`, which is gitignored (client work).
-- If a page's v0 output uses Framer Motion (`motion` / `framer-motion`), record that in the
-  page's `meta.md` so the build step installs the dependency.
+- Your output is a **reference only** — do NOT copy it into `src/`, install deps, or run the
+  app. Promoting designs into the Next.js app is the build step (Phase 3), so don't duplicate
+  that work here.
+- `framer-motion` ships in the template's dependencies. If a page uses it, still record that
+  in the page's `meta.md`.
 - Never invent brand details — use the brief. Generate imagery only to fill genuine gaps,
   and say so.
 - Touch only this client's folder.

@@ -28,6 +28,16 @@ direction — pausing for your approval per page. Approved pages are saved to
 `clients/<slug>/design/<page>/` (code + v0 URL) and become the reference the build is
 verified against. Needs `SUPABASE_SERVICE_ROLE_KEY` in `.env` for asset publishing.
 
+## Build the app (Phase 3)
+
+Once the designs are approved, run the **`build` agent** for the client. It promotes
+`clients/<slug>/design/` into the real Next.js app: maps each page to a route under
+`src/app/`, refactors v0's reference code into reusable `src/components/`, swaps in real
+**shadcn** primitives, copies assets into `public/images/`, installs any missing deps,
+wires forms to Supabase, and verifies with `npm run build`. v0 output is a reference —
+this is the step that turns it into a running site (don't hand-copy designs into `src/`
+yourself). Schema creation and deploy are the next phases (Supabase, Vercel).
+
 ## One-time setup per clone
 
 1. `cp .env.example .env` and fill in the keys.
@@ -68,3 +78,15 @@ Read `node_modules/next/dist/docs/` before writing code. Already-bitten gotchas 
 - `src/lib/supabase/server.ts` — server client (Server Components / Route Handlers).
 - `src/lib/supabase/middleware.ts` — `updateSession()` for auth refresh.
 - `src/proxy.ts` — runs `updateSession()` on every request.
+
+## Troubleshooting (from real runs)
+
+- **`Cannot find module '../server/require-hook'` on `npm run dev`** — a corrupted/partial
+  Next.js install, not a code issue. Fix: `rm -rf node_modules package-lock.json && npm install`.
+- **`Module not found: framer-motion`** — `framer-motion` ships in dependencies now; if you
+  still hit this, run `npm install`. v0 designs commonly import it for animations.
+- **`publish-assets.py` fails with `InvalidURL` / on filenames with spaces** — fixed: asset
+  filenames are sanitized to URL-safe keys before upload. Make sure your copy is current.
+- **v0 acknowledges a change but the code doesn't update** — the design agent now re-fetches
+  the chat's files (`getChat`) and diffs to confirm the change landed; if v0 still won't
+  regenerate, it edits the saved files directly rather than trusting the chat text.

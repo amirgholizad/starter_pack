@@ -24,12 +24,26 @@ import argparse
 import json
 import mimetypes
 import os
+import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.request
 from pathlib import Path
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".avif"}
+
+
+def safe_name(name: str) -> str:
+    """Slugify a filename into a URL/storage-safe key, preserving the extension.
+
+    Storage paths become part of a URL, so spaces and other unsafe characters (which
+    caused `InvalidURL: URL can't contain control characters`) must be removed.
+    """
+    stem = unicodedata.normalize("NFKD", Path(name).stem).encode("ascii", "ignore").decode()
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", stem)
+    stem = re.sub(r"-{2,}", "-", stem).strip("-._").lower() or "file"
+    return f"{stem}{Path(name).suffix.lower()}"
 
 
 def _req(method: str, url: str, key: str, *, data: bytes | None = None,
@@ -81,25 +95,24 @@ def main() -> int:
 
     failures = 0
     for img in images:
-        path = f"{args.prefix}/{img.name}"
+        path = f"{args.prefix}/{safe_name(img.name)}"  # sanitized → URL-safe storage key
+        public_url = f"{base}/storage/v1/object/public/{args.bucket}/{path}"
         ctype = mimetypes.guess_type(img.name)[0] or "application/octet-stream"
         status, body = _req(
             "POST", f"{base}/storage/v1/object/{args.bucket}/{path}", key,
             data=img.read_bytes(), content_type=ctype,
         )
-        if status in (200, 201):
-            print(f"{img.name}\t{base}/storage/v1/object/public/{args.bucket}/{path}")
-        else:
+        if status not in (200, 201):
             # try upsert (PUT) in case it already exists
-            status2, body2 = _req(
+            status, body = _req(
                 "PUT", f"{base}/storage/v1/object/{args.bucket}/{path}", key,
                 data=img.read_bytes(), content_type=ctype,
             )
-            if status2 in (200, 201):
-                print(f"{img.name}\t{base}/storage/v1/object/public/{args.bucket}/{path}")
-            else:
-                failures += 1
-                print(f"FAILED {img.name}: {status} {body.decode(errors='replace')[:200]}", file=sys.stderr)
+        if status in (200, 201):
+            print(f"{img.name}\t{public_url}")
+        else:
+            failures += 1
+            print(f"FAILED {img.name}: {status} {body.decode(errors='replace')[:200]}", file=sys.stderr)
 
     return 1 if failures else 0
 
