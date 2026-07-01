@@ -36,8 +36,8 @@ and **`cookies()` is async** (`await cookies()`). Don't reach for patterns from 
    Apply brand tokens (colors/fonts from §2) via `globals.css` / Tailwind theme.
 6. **Forms / data.** Wire any contact/lead form to a **Server Action or route handler** that
    inserts via `src/lib/supabase/server.ts` using the §6 data model. If the target table does
-   not exist yet, scaffold the code and **list the table as a Phase 4 (Supabase) handoff** —
-   don't block the build on it.
+   not exist yet, scaffold the code and **list the table as a Phase 4 (Supabase) handoff for
+   the `db` agent** (it creates the tables + RLS) — don't block the build on it.
 7. **Verify — do not skip.** Run `npm run build` (authoritative for this Next) and fix **every**
    error: missing deps, wrong import paths, server/client boundary, async `cookies()`. Add
    `"use client"` only where interactivity / Framer Motion requires it. Then start `npm run dev`
@@ -54,3 +54,6 @@ and **`cookies()` is async** (`await cookies()`). Don't reach for patterns from 
 - Verify with a real `npm run build` before claiming success — unresolved imports and broken
   server/client boundaries are the most common failures.
 - Touch only this client's app within the project; don't modify other clients' folders.
+- **Operational policy** (`AGENTS.md` → *Operational rules*): if `npm run build` won't go green
+  after a couple of distinct fixes, stop and log a `BLOCKED` entry in `logs/README.md` rather
+  than churning build attempts.

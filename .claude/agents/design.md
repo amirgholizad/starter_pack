@@ -99,3 +99,6 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
 - Never invent brand details — use the brief. Generate imagery only to fill genuine gaps,
   and say so.
 - Touch only this client's folder.
+- **Operational policy** (`AGENTS.md` → *Operational rules*): cap v0 re-prompts per the retry
+  rule — after ~2 tries that don't land a change, edit the saved files yourself (as above) or
+  log it and move on; never loop re-prompting v0. Record blocks/workarounds in `logs/README.md`.

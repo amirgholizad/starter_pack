@@ -36,7 +36,53 @@ Once the designs are approved, run the **`build` agent** for the client. It prom
 **shadcn** primitives, copies assets into `public/images/`, installs any missing deps,
 wires forms to Supabase, and verifies with `npm run build`. v0 output is a reference —
 this is the step that turns it into a running site (don't hand-copy designs into `src/`
-yourself). Schema creation and deploy are the next phases (Supabase, Vercel).
+yourself). It **defers table creation** — the tables its forms insert into are handed off
+to Phase 4 (the `db` agent) rather than blocking the build.
+
+## Create the schema (Phase 4)
+
+Run the **`db` agent** for the client. It reads the brief's data model (§6), functionality
+(§5), and developer notes (§8) plus the build agent's table handoffs, then creates the real
+Supabase schema via the Supabase MCP: tables with proper types, **row-level security on every
+table** (public insert for lead/contact/comment forms, `auth.uid()`-scoped policies for
+owner/admin data), a named migration (`apply_migration`), a `get_advisors` security/perf pass,
+and TypeScript types written to `src/lib/supabase/types.ts`. **It targets the one project set
+by `project_ref` in `.mcp.json`** — the agent confirms that ref is this client's project
+before migrating, since a migration isn't reversible. Auth users can't be made in SQL, so it
+documents the one-time admin-user setup where a protected/admin route is needed.
+
+Each client gets **its own project**. Provision one (and repoint the repo at it) with:
+
+```
+python scripts/new-supabase-project.py <slug>
+```
+
+The MCP is pinned to a single project and can't create projects, so this uses the Supabase
+**Management API** (needs `SUPABASE_ACCESS_TOKEN` in `.env`): it creates the project, then
+rewrites `project_ref` in `.mcp.json` and fills `NEXT_PUBLIC_SUPABASE_URL` / `_ANON_KEY` /
+`SUPABASE_SERVICE_ROLE_KEY` in `.env`. The MCP only re-reads the ref on connect, so **re-auth
+after the swap** (`claude /mcp` → supabase). The `db` agent runs this for you as its step 0.
+
+## Deploy to Vercel (Phase 5)
+
+Run the **`deploy` agent** for the client. There's no Vercel MCP, so it drives the `vercel`
+CLI: it refuses to ship unless `npm run build` passes, sets the Supabase env vars on Vercel
+(`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) for production + preview, ships a
+**preview** first and pauses for your review, then promotes to **production only on explicit
+approval** (`vercel --prod`). If the client owns a domain (§7) it wires the DNS records; else
+it hands over the `*.vercel.app` URL. Needs `VERCEL_TOKEN` in `.env` for non-interactive runs
+(or a one-time `vercel login`).
+
+## One command for the whole pipeline
+
+Two entry points run all five phases with the human gates (brief review, per-page design
+approval, pre-production deploy) intact:
+
+- **`/new-site "Business Name"`** — a slash command that orchestrates intake → design → build
+  → db → deploy inside one Claude Code session, dispatching each phase to its subagent.
+- **`scripts/onboard.sh "Business Name"`** — the shell launcher: runs intake headlessly,
+  pauses for brief review, then opens the design and build agents; the db and deploy steps are
+  opt-in prompts at the end (they default to "no" so you can run schema/deploy deliberately).
 
 ## One-time setup per clone
 
@@ -65,6 +111,15 @@ v0 note:
   `V0_API_KEY` must be exported in the shell that launches Claude Code so `${V0_API_KEY}`
   resolves in the header. The community `v0-mcp-server` npm package was dropped — it rejects
   current `v1:...:vcp_...` keys. Docs: https://v0.app/docs/api/platform/adapters/mcp-server
+
+## Agent logging & guardrails
+
+Every agent follows the **Operational rules** in `AGENTS.md`: bounded retries (at most two
+*materially different* fixes before escalating — no infinite loops), token/scope discipline,
+and a shared problem log. When an agent gives up on a step (`BLOCKED`), works around it
+(`WORKAROUND`), or hits a recurring gotcha, it appends a structured entry to
+[`logs/README.md`](logs/README.md) — client referenced by slug only, no PII or secrets. Skim
+that file to see what keeps breaking across runs.
 
 ## Stack notes (this is NOT standard Next.js)
 

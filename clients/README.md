@@ -12,8 +12,10 @@ Drop the Google Form CSV export into the `intake/` folder, then either run the l
 scripts/onboard.sh "Business Name"
 ```
 
-…which runs intake headlessly, pauses for you to review the brief, then opens the
-interactive design session. Or do it by hand — ask Claude:
+…which runs intake headlessly, pauses for you to review the brief, then opens the design and
+build sessions (with db + deploy as opt-in prompts at the end). For the whole pipeline inside
+one Claude session use the **`/new-site "Business Name"`** command. Or do it by hand — ask
+Claude:
 
 > "Run the **intake** agent for *<Business Name>* from the CSV in `intake/`."
 

@@ -115,3 +115,6 @@ Ignore trailing junk columns the export sometimes appends (e.g. an empty `Column
 - Briefs and assets live under `clients/*`, which is gitignored (PII + binaries).
   Never move client data out of that folder or commit it.
 - Touch only the target client's folder.
+- **Operational policy** (`AGENTS.md` → *Operational rules*): if a row won't parse or an asset
+  download (rclone) keeps failing, don't retry endlessly — fill what you can, flag gaps with
+  `(confirm: …)`, log the problem to `logs/README.md`, and move on. Never write PII into the log.
