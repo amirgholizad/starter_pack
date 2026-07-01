@@ -33,9 +33,12 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
    It uploads the images to a public Supabase bucket and prints `filename → URL`. Capture
    those URLs. If it reports a missing `SUPABASE_SERVICE_ROLE_KEY` or no images, don't
    fail — continue with branding described in text only, and note it in your summary.
-   Then **confirm a logo image is present** in `clients/<slug>/assets/`: if §2 says a logo
-   was provided but none is there (sometimes it arrives as a PDF/screenshot, not an image
-   file), stop and ask the user for the logo file before generating.
+   Assets are named by role — `logo.*`, `photo-N.*`, `page-content-N.*`, `brand-guide.*` —
+   and `assets/manifest.md` maps each file to its role; use those names to pick the **logo**
+   and page **photos** for attachments instead of guessing. Then **confirm a logo image is
+   present** (`logo.*`) in `clients/<slug>/assets/`: if §2 says a logo was provided but none
+   is there (sometimes it arrives as a PDF/screenshot, not an image file), stop and ask the
+   user for the logo file before generating.
 2b. **Snapshot the inspiration links** so v0 can see them. For each inspiration link in §4:
    - if it's already a direct image (e.g. a Dribbble shot `…png`/`…gif`, a Land-book image),
      use that URL as-is;

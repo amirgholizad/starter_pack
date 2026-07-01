@@ -34,15 +34,20 @@ before writing anything. Never guess which client.
    CSV columns by their question text (see mapping below).
 5. Run the asset download:
    `python scripts/fetch-drive-assets.py clients/<slug>/brief.md`
-   If it reports rclone is missing/unconfigured, don't fail — note it in the summary and
-   point the user to `brew install rclone && rclone config` (Drive remote named `gdrive`).
+   It renames each download by the field it sits under (`logo.jpg`, `page-content-1.jpg`,
+   `photo-1.jpg`, `brand-guide.pdf`) and writes `assets/manifest.md` — so **keep each link
+   under its field label** (step 4 / filling rules) or the role can't be detected. If it
+   reports rclone is missing/unconfigured, don't fail — note it in the summary and point the
+   user to `brew install rclone && rclone config` (Drive remote named `gdrive`).
 6. Report a concise summary: slug, files created, assets downloaded (or skipped), and a
    bullet list of every `(confirm: …)` open question you left in the brief.
 
 ## Filling rules
 - Copy contact details (name, phone, email, location) **verbatim** — never alter PII.
-- Keep every Google Drive / Docs link **inline** in sections 2, 3, and 8 and do not
-  shorten them — the fetch script greps the file for those URLs.
+- Keep every Google Drive / Docs link **inline under its field label** (Logo · Brand guide ·
+  Written content · Photos in §2/§3, and §8) and do not shorten them — the fetch script greps
+  the file for those URLs *and names each download after the field it sits under*, so a link
+  placed under the wrong label will be misnamed.
 - Blank form fields → write `(none)`.
 - **Section 4 (design direction → v0):** list the vibe adjectives (the form joins them
   with `;` or `,`), and for each reference site give the client's stated reason; if none was

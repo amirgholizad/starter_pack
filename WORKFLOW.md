@@ -16,7 +16,8 @@ v0 outputs the same stack we build in, so its code is a **reference** to refacto
 Each client starts from a filled brief. Drop the Google Form CSV export into the `intake/`
 folder and ask Claude to **run the `intake` agent** for that client — it installs the
 client-privacy `.gitignore` rules, fills `clients/<slug>/brief.md` (derived Supabase schema
-+ v0 design direction), and downloads their Drive assets into `clients/<slug>/assets/`.
++ v0 design direction), and downloads their Drive assets into `clients/<slug>/assets/`
+(renamed by role — `logo.*`, `photo-N.*`, `page-content-N.*` — with an `assets/manifest.md`).
 See `clients/README.md`. Then feed the brief to v0.
 
 ## Design with v0 (one page at a time)

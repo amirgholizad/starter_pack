@@ -77,7 +77,11 @@
 
 ## 9. Assets to fetch
 > Run: `python scripts/fetch-drive-assets.py clients/<name>/brief.md`
-> It pulls every Google Drive link above into `clients/<name>/assets/`.
+> It pulls every Google Drive link above into `clients/<name>/assets/`, **renaming each file
+> by the field it sits under** — `logo.jpg`, `brand-guide.pdf`, `page-content-1.jpg`,
+> `photo-1.jpg` — so the design/build agents don't confuse them. `assets/manifest.md` maps
+> every file back to its role + Drive id. (Keep each link under its field label above, or the
+> role can't be detected.)
 - [ ] logo
 - [ ] page content
 - [ ] photos
