@@ -23,18 +23,79 @@ intake → design → build → db → deploy
 
 Full detail + troubleshooting: **[WORKFLOW.md](WORKFLOW.md)**.
 
-## One-time setup (per clone)
+## Prerequisites
 
-1. **Keys** — `cp .env.example .env` and fill it in:
-   - `V0_API_KEY` — https://v0.app → account → API Keys
-   - `SUPABASE_ACCESS_TOKEN` — https://supabase.com/dashboard/account/tokens (creates a project per client)
-   - `VERCEL_TOKEN` *(optional)* — https://vercel.com/account/tokens (non-interactive deploys)
-   - Leave the `NEXT_PUBLIC_SUPABASE_*` / `SUPABASE_SERVICE_ROLE_KEY` / `DB_PASSWORD` blank — the `db` phase fills them per client.
-2. **Export env** so the MCP servers see it: `set -a; source .env; set +a` (or use direnv).
-3. **`npm install`**
-4. **rclone** (Drive asset download): `brew install rclone && rclone config` → create a read-only Google Drive remote named `gdrive`, authorized with the account that owns the intake form.
-5. **Launch Claude Code**, approve the MCP servers, then authenticate the Supabase MCP once:
-   `claude /mcp` → `supabase` → complete OAuth (do this in a real terminal, not the IDE extension).
+Install these once on your machine:
+
+- **Node.js 20.9+** and **npm** — https://nodejs.org (the repo runs on Node 22; use `nvm` if you juggle versions).
+- **Git** — https://git-scm.com
+- **Claude Code CLI** — `npm install -g @anthropic-ai/claude-code` (the whole pipeline runs inside it).
+- **rclone** — `brew install rclone` (macOS) — downloads client assets from Google Drive.
+
+And accounts / API keys (you'll paste these into `.env` below):
+
+- **v0** — https://v0.app (design generation)
+- **Supabase** — https://supabase.com (a personal access token + OAuth sign-in)
+- **Vercel** *(optional)* — https://vercel.com (only for non-interactive deploys)
+
+## Get started (one-time per clone)
+
+**1. Clone the repo and enter it:**
+
+```bash
+git clone https://github.com/amirgholizad/starter_pack.git
+cd starter_pack
+```
+
+**2. Install dependencies:**
+
+```bash
+npm install
+```
+
+**3. Configure your environment.** Copy the template and fill it in:
+
+```bash
+cp .env.example .env
+```
+
+In `.env`, set:
+- `V0_API_KEY` — https://v0.app → account → API Keys
+- `SUPABASE_ACCESS_TOKEN` — https://supabase.com/dashboard/account/tokens (used to create a project per client)
+- `VERCEL_TOKEN` *(optional)* — https://vercel.com/account/tokens
+
+Leave `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, and `DB_PASSWORD` blank — the `db`
+phase fills them automatically per client. Then export the vars so the MCP servers pick them up:
+
+```bash
+set -a; source .env; set +a      # or use direnv
+```
+
+**4. Connect Google Drive (for client assets):**
+
+```bash
+rclone config
+```
+
+Create a **read-only Google Drive remote named `gdrive`**, authorized with the account that
+owns the intake form. (Override the name later with `RCLONE_DRIVE_REMOTE` if needed.)
+
+**5. Launch Claude Code and connect the MCP servers:**
+
+```bash
+claude
+```
+
+On first launch, **approve the MCP servers** (`shadcn`, `v0`, `supabase`). Then authenticate
+the Supabase MCP once — in a real terminal, not the IDE extension:
+
+```
+/mcp        → select supabase → complete the OAuth flow
+```
+
+**6. (Optional) sanity-check the app runs:** `npm run dev`, then open http://localhost:3000.
+
+You're set up. From here, everything happens inside Claude Code.
 
 ## Build a new website
 
