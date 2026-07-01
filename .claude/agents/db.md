@@ -37,7 +37,7 @@ python scripts/new-supabase-project.py <slug>
 ```
 It provisions a fresh project via the Management API (needs `SUPABASE_ACCESS_TOKEN` in `.env`),
 rewrites `project_ref` in `.mcp.json`, and fills `NEXT_PUBLIC_SUPABASE_URL` / `_ANON_KEY` /
-`SUPABASE_SERVICE_ROLE_KEY` in `.env`. Because the **MCP only re-reads `project_ref` on
+`SUPABASE_SERVICE_ROLE_KEY` (+ records `DB_PASSWORD`) in `.env`. Because the **MCP only re-reads `project_ref` on
 connect**, after the swap the user must **re-auth** (`claude /mcp` → supabase) — tell them to
 do that, then proceed. If `SUPABASE_ACCESS_TOKEN` is missing, ask them to add it (or to swap
 the ref by hand) and stop rather than migrating the wrong project.

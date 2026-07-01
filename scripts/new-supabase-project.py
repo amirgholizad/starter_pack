@@ -10,7 +10,7 @@ uses the Vercel CLI) to:
   1. create a new project in your org (named after the client slug),
   2. wait for it to come up and read its anon + service-role keys,
   3. rewrite `project_ref` in .mcp.json to the new project,
-  4. fill NEXT_PUBLIC_SUPABASE_URL / _ANON_KEY / SUPABASE_SERVICE_ROLE_KEY in .env.
+  4. fill NEXT_PUBLIC_SUPABASE_URL / _ANON_KEY / SUPABASE_SERVICE_ROLE_KEY (+ DB_PASSWORD) in .env.
 
 After it runs, re-auth the MCP so it targets the new project:  claude /mcp  → supabase.
 Then the `db` agent can create the schema against the right project.
@@ -173,6 +173,7 @@ def main():
     print(f"▶ Region  : {region}")
     org_id = resolve_org(token, org)
 
+    db_pass = None
     ref = find_existing(token, name)
     if ref:
         print(f"▶ Reusing existing project '{name}' → {ref}")
@@ -188,7 +189,8 @@ def main():
         if not ref:
             die(f"create returned no project ref: {created}")
         print(f"✓ Created project → {ref}")
-        print(f"  DB password (save this — it is not retrievable later):\n    {db_pass}")
+        print(f"  DB password (saved to .env as DB_PASSWORD; keep it safe — it is not "
+              f"retrievable from Supabase later):\n    {db_pass}")
         wait_healthy(token, ref)
 
     anon, service = get_keys(token, ref)
@@ -200,6 +202,8 @@ def main():
         env_updates["NEXT_PUBLIC_SUPABASE_ANON_KEY"] = anon
     if service:
         env_updates["SUPABASE_SERVICE_ROLE_KEY"] = service
+    if db_pass:
+        env_updates["DB_PASSWORD"] = db_pass
     upsert_env(env_updates)
 
     print()
@@ -207,7 +211,8 @@ def main():
     print(f"  • .mcp.json      project_ref → {ref}")
     print(f"  • .env           NEXT_PUBLIC_SUPABASE_URL"
           + ("/_ANON_KEY" if anon else "")
-          + (" + SUPABASE_SERVICE_ROLE_KEY" if service else ""))
+          + (" + SUPABASE_SERVICE_ROLE_KEY" if service else "")
+          + (" + DB_PASSWORD" if db_pass else ""))
     if not (anon and service):
         print("  ⚠ Some keys weren't returned yet — re-run once the project is healthy, "
               "or copy them from the dashboard (Settings → API).")

@@ -60,7 +60,7 @@ python scripts/new-supabase-project.py <slug>
 The MCP is pinned to a single project and can't create projects, so this uses the Supabase
 **Management API** (needs `SUPABASE_ACCESS_TOKEN` in `.env`): it creates the project, then
 rewrites `project_ref` in `.mcp.json` and fills `NEXT_PUBLIC_SUPABASE_URL` / `_ANON_KEY` /
-`SUPABASE_SERVICE_ROLE_KEY` in `.env`. The MCP only re-reads the ref on connect, so **re-auth
+`SUPABASE_SERVICE_ROLE_KEY` (and records `DB_PASSWORD`) in `.env`. The MCP only re-reads the ref on connect, so **re-auth
 after the swap** (`claude /mcp` → supabase). The `db` agent runs this for you as its step 0.
 
 ## Deploy to Vercel (Phase 5)
