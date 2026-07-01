@@ -37,6 +37,12 @@
   - <url> — <what puts them off>
 - Inspiration to emulate (live site / Dribbble / Land-book):
   - <url> — <what to copy: layout, color, type, spacing, overall feel>
+- Developer style-match (authoritative — from "Additional comments by developers"):
+  > When present, this overrides the vaguer client references above. The design agent
+  > screenshots these URLs and attaches them to v0.
+  - Style: <url> — copy the visual style: layout, color, type, spacing, overall feel.
+  - Context: <url> — copy the content / domain context: sections, information
+    architecture, imagery subject (this is the "what the site is about" reference).
 - Animations / interactions to emulate (a screenshot can't show motion — describe it):
   - <e.g. hero text staggers/fades up on load, cards lift + shadow on hover, sticky nav
     shrinks on scroll, sections reveal on scroll, parallax hero image, marquee logo row>
@@ -59,7 +65,17 @@
 - Ideal customers: <...>
 - Anything else: <...>
 
-## 8. Assets to fetch
+## 8. Developer notes — → v0 + build + supabase
+> From the intake CSV's **"Additional comments by developers"** column. Authored by the
+> developer (not the client) and **authoritative** — these override vaguer client answers
+> and drive functionality (§5), the data model (§6), and the style-match (§4). Blank → "(none)".
+- Raw comment (verbatim): <...>
+- Parsed requirements:
+  - <build/functionality: e.g. comments section, protected admin route, ...>
+  - <data/auth: e.g. moderation table, owner-only login, ...>
+  - <design: pointer to the §4 style/context URLs>
+
+## 9. Assets to fetch
 > Run: `python scripts/fetch-drive-assets.py clients/<name>/brief.md`
 > It pulls every Google Drive link above into `clients/<name>/assets/`.
 - [ ] logo

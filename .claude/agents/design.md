@@ -23,8 +23,11 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
 ## Procedure
 1. Read `clients/<slug>/brief.md`. Pull out: the **page list** (§3), **design direction**
    (§4 — vibe adjectives, reference/inspiration links + reasons, and the **animations /
-   interactions to emulate**), **brand** (§2 — colors, fonts, logo), and the **per-page
-   content** (§3).
+   interactions to emulate**), **brand** (§2 — colors, fonts, logo), the **per-page
+   content** (§3), and **§8 Developer notes** (authoritative build/design requirements).
+   If §4 has a **Developer style-match**, it is the primary reference — its **Style** URL
+   sets the look (layout, color, type, spacing) and its **Context** URL sets the content /
+   subject matter; weight these above the client's own "sites they love".
 2. **Publish assets so v0 can reach them.** Run:
    `python scripts/publish-assets.py clients/<slug>/assets <slug>`
    It uploads the images to a public Supabase bucket and prints `filename → URL`. Capture
@@ -53,7 +56,10 @@ Next.js (App Router) · TypeScript · Tailwind · shadcn/ui components. v0 outpu
         reference sites with what the client liked about them;
       - **inspiration**: "Match the visual style, layout, type and spacing of the attached
         reference screenshot(s). Specifically copy: <client's note per reference>." (The
-        screenshot is attached in step b.)
+        screenshot is attached in step b.) When §4 has a **Developer style-match**, be
+        explicit about the split: "Match the *visual style* (layout, color, type, spacing)
+        of <Style screenshot>; take the *content and section structure* (what the site is
+        about) from <Context screenshot>."
       - **animations**: "Implement these motions with **Framer Motion** (`motion/react`):
         <the §4 animation notes>. Add tasteful scroll-reveal and hover motion consistent
         with the reference; keep it smooth and not gratuitous." If §4 lists no animations,

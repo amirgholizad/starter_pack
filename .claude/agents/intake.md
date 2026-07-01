@@ -45,7 +45,7 @@ before writing anything. Never guess which client.
   shorten them — the fetch script greps the file for those URLs.
 - Blank form fields → write `(none)`.
 - **Section 4 (design direction → v0):** list the vibe adjectives (the form joins them
-  with `;`), and for each reference site give the client's stated reason; if none was
+  with `;` or `,`), and for each reference site give the client's stated reason; if none was
   given, write `(no reason given)`.
 - **Section 6 (data model → supabase):** *derive* a schema from the goal + dashboard +
   features + integrations. Name tables and fields with types. A simple contact/lead site
@@ -53,6 +53,25 @@ before writing anything. Never guess which client.
   derivation, not client-stated.
 - Where the form is ambiguous or self-contradictory, add an inline `(confirm: …)` note
   instead of guessing.
+- **"Additional comments by developers" (§8, authoritative):** this column is written by the
+  developer, not the client — so it is trusted input, not client data, and it **overrides**
+  vaguer client answers. Do three things:
+  1. Put the text **verbatim** in §8 "Raw comment".
+  2. Extract every URL. A URL described as the *style/look* → §4 "Developer style-match ·
+     Style"; a URL described as the *context / what the site is about* → §4 "· Context".
+     If the developer's URL resolves a vague client reference (e.g. client said "A+ driving
+     school", developer gives its real URL), update the §4 client bullet and clear its
+     `(confirm: …)`.
+  3. Fan the concrete requirements into the right sections: build/UI features → §5; anything
+     stored or access-controlled (comments, moderation, owner-only login) → §6 as tables +
+     auth. Note in §6 that owner-only/pre-set-login means Supabase **Auth** (a single admin
+     user), and a protected route — not a public sign-up.
+- **Export-format tolerance.** The CSV changes shape between exports; match columns by the
+  question keyword, not position. Specifically: the email column may be headed `Username`
+  **or** `Email Address`; multi-value fields (social links, pages, drive links, vibe
+  adjectives) may be separated by `;` **or** `,`/`, ` — split on whichever is present;
+  timestamps may be ISO or `M/D/YYYY H:MM:SS`. Drive links may be `…?id=FILEID` or
+  `…/open?id=FILEID` — keep them inline verbatim either way (the fetch script matches both).
 
 ## Column → brief mapping (match by question keyword)
 | Form question contains            | Brief field                          |
@@ -77,7 +96,7 @@ before writing anything. Never guess which client.
 | "awards"                          | 3 · Awards / certifications          |
 | "websites you love"               | 4 · Sites they love (+ reason)       |
 | "not a fan" / "dislike"           | 4 · Sites they dislike (+ reason)    |
-| "vibe" / "words that best describe" | 4 · Vibe adjectives (split on `;`) |
+| "vibe" / "words that best describe" | 4 · Vibe adjectives (split on `;` or `,`) |
 | "features"                        | 5 · Features needed                  |
 | "dashboard"                       | 5 · Dashboard for user data          |
 | "tools" / "connect"               | 5 · Integrations                     |
@@ -85,7 +104,10 @@ before writing anything. Never guess which client.
 | "domain"                          | 7 · Domain owned                     |
 | "existing website"                | 7 · Existing site to replace         |
 | "ideal customers"                 | 7 · Ideal customers                  |
-| "anything else"                   | 7 · Anything else                    |
+| "anything else"                   | 7 · Anything else (client-stated)    |
+| "additional comments by developers" | 8 · Developer notes (raw) **and** fan out into 4 · style-match, 5 · Features, 6 · Data model |
+
+Ignore trailing junk columns the export sometimes appends (e.g. an empty `Column 31`).
 
 ## Constraints
 - Never invent client data — use only the row. The only thing you synthesize is the
