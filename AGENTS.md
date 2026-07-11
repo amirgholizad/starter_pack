@@ -1,42 +1,63 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Project guide
 
-# This is NOT the Next.js you know
+A minimal starter on a fixed stack: **Next.js · React · Tailwind · shadcn**.
 
-- This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+## This is NOT the Next.js you know
 
-- Components come from shadcn only (no antd, no other UI kit).
-- v0 output is a reference, not final code, it gets refactored into the app's structure.
-- Tailwind for all styling; no inline style hacks.
-- Supabase for data; no other DB client.
-<!-- END:nextjs-agent-rules -->
+- This version has breaking changes — APIs, conventions, and file structure may all differ
+  from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before
+  writing any code. Heed deprecation notices.
 
-# Operational rules (all agents)
+## Conventions
 
-Applies to every pipeline agent (`intake`, `design`, `build`, `db`, `deploy`) and the main
-session. The goal: **fail fast, log it, never spin.**
+- UI components come from **shadcn** only (no antd, no other UI kit). Add them with the
+  shadcn CLI / MCP; they land in `src/components/ui/`.
+- **Tailwind** for all styling — no inline `style` hacks.
+- Path aliases (see `components.json`): `@/components`, `@/lib`, `@/components/ui`,
+  `@/lib/utils`, `@/hooks`.
+- The `cn()` helper in `src/lib/utils.ts` merges class names.
 
-## Don't get stuck — bounded retries
+## Contact forms (Web3Forms)
 
-- When a step fails (tool error, failed `npm run build`, MCP/API error, an expected result
-  that didn't land), you may retry with a **materially different** fix **at most twice**
-  (3 attempts total for the same problem). Never repeat the same failing call unchanged.
-- If **two different approaches both fail, stop.** Do not keep inventing variations — that's
-  the loop that burns tokens. Escalate to the user with what you tried.
-- Prefer the cheapest fix first; don't re-run an expensive generation (v0, a full build,
-  a migration) just to "see if it works again."
+Contact / lead forms email submissions straight to an inbox via **Web3Forms** — no backend,
+no database. The library is already installed (`@web3forms/react`). There is no form component
+yet; build one on demand using the pattern below.
 
-## Token & scope discipline
+**Setup (once per site):**
 
-- Don't re-read the same large file or re-run the same search repeatedly — read the specific
-  part you need and remember it. Avoid full-repo scans when a targeted path will do.
-- If a subtask balloons beyond its point (endless refactor, a design that won't converge),
-  **pause and report progress** instead of pressing on silently.
-- Stay in your lane: touch only this client's folder / this phase's files.
+1. Get a free access key at https://web3forms.com — enter the destination inbox and the key
+   is emailed instantly (no account). Use a separate key per client site.
+2. Put it in `.env.local` (copy from `.env.example`):
+   `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=...`. The key is public/safe to ship to the browser —
+   it only allows *submitting* to the bound inbox, nothing else.
 
-## Log problems to `logs/README.md`
+**Building the form:**
 
-Whenever you hit a real problem — **especially when you give up (BLOCKED) or work around it
-(WORKAROUND)** — append an entry to [`logs/README.md`](logs/README.md) in the format defined
-there before you stop or move on. Reference the client by **slug only**; never write PII,
-keys, or tokens into the log. If a failure is non-blocking, log it, say you're skipping it,
-and continue with the rest of the task rather than halting the whole run.
+- Add the shadcn primitives it needs — `button` is already in `src/components/ui/`:
+  ```bash
+  npx shadcn@latest add input textarea label sonner
+  ```
+  (`sonner` is optional — use it for success/error toasts.)
+- Make it a client component and submit with the installed hook (default export is
+  `useWeb3forms`, lowercase `forms`):
+
+  ```tsx
+  "use client";
+  import useWeb3forms from "@web3forms/react";
+
+  const { submit } = useWeb3forms({
+    access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY!,
+    onSuccess: (msg) => { /* toast success, reset the form */ },
+    onError:   (msg) => { /* toast error */ },
+  });
+  // on submit: await submit({ name, email, message, botcheck: "" });
+  ```
+
+- **Spam:** include a hidden honeypot field named `botcheck` — Web3Forms drops any submission
+  where it is filled. Pass extra params (e.g. `subject`, `from_name`) via the hook's optional
+  `settings`.
+
+**Alternative — hide the key / validate server-side:** POST the same fields to
+`https://api.web3forms.com/submit` from a Next.js **server action** instead of the client
+hook; then the key can be a plain (non-`NEXT_PUBLIC_`) env var. The client hook needs no
+server code at all — prefer it unless you specifically need server-side handling.
