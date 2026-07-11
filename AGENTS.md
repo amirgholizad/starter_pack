@@ -34,6 +34,9 @@ build agent for `<slug>`"). Client briefs/assets live under `clients/<slug>/` an
 - UI components come from **shadcn** only (no antd, no other UI kit). Add them with the
   shadcn CLI / MCP; they land in `src/components/ui/`.
 - **Tailwind** for all styling — no inline `style` hacks.
+- **Animations:** `framer-motion` is installed (`import { motion } from "framer-motion"`); use
+  it for entrance / scroll / hover motion (client components only). Plain Tailwind /
+  `tw-animate-css` is fine for simple transitions.
 - Path aliases (see `components.json`): `@/components`, `@/lib`, `@/components/ui`,
   `@/lib/utils`, `@/hooks`.
 - The `cn()` helper in `src/lib/utils.ts` merges class names.

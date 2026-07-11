@@ -65,9 +65,10 @@ other UI kit, no database.
      `src/components/ui/` rather than hand-rolling one. `button` is already there.
    - **Server Components by default**; add `"use client"` only where interactivity requires it
      (the contact form, any client-side motion).
-   - **Motion:** the starter has `tw-animate-css` + Tailwind — use CSS transitions and
-     scroll/hover utilities for the §4 animations. Only `npm install` a motion library if a
-     described effect genuinely needs it; keep it tasteful, not gratuitous.
+   - **Motion:** `framer-motion` is installed (`import { motion } from "framer-motion"`) — use
+     it for the §4 animations (entrance/stagger, scroll reveal, hover); it needs `"use client"`.
+     Reach for plain Tailwind / `tw-animate-css` on simple transitions. Keep motion tasteful,
+     not gratuitous.
    - **Real copy:** use the brief's content. Never invent testimonials, awards, or facts. Where
      copy is missing, use restrained placeholder text and note it in your summary.
 
