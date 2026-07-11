@@ -1,6 +1,27 @@
 # Project guide
 
-A minimal starter on a fixed stack: **Next.js · React · Tailwind · shadcn**.
+A repeatable pipeline that turns a client intake form into a **built website** on a fixed
+stack: **Next.js · React · Tailwind · shadcn**. Claude does the whole thing end to end — no v0,
+no backend, no paid design tool.
+
+## Pipeline
+
+```
+intake → build
+```
+
+- **intake** ([.claude/agents/intake.md](.claude/agents/intake.md)) — reads one row of the
+  Google-Form CSV in `intake/` → fills `clients/<slug>/brief.md` (design direction +
+  inspiration links) and downloads the client's Drive assets (optional, needs rclone). **You
+  review the brief** before building.
+- **build** ([.claude/agents/build.md](.claude/agents/build.md)) — studies the brief's
+  inspiration sites (**screenshot via `scripts/snap.sh` + fetched text via WebFetch**), sets the
+  brand theme, then designs and builds the pages into `src/app/` with Tailwind + shadcn. Wires
+  any contact form to Web3Forms and verifies `npm run build`.
+
+Run both with **`/new-site "Business Name"`**, or dispatch one agent at a time (e.g. "run the
+build agent for `<slug>`"). Client briefs/assets live under `clients/<slug>/` and are gitignored
+(PII + binaries); only `clients/_template/` and the READMEs are tracked.
 
 ## This is NOT the Next.js you know
 
@@ -61,3 +82,20 @@ yet; build one on demand using the pattern below.
 `https://api.web3forms.com/submit` from a Next.js **server action** instead of the client
 hook; then the key can be a plain (non-`NEXT_PUBLIC_`) env var. The client hook needs no
 server code at all — prefer it unless you specifically need server-side handling.
+
+## Operational rules (all agents)
+
+Applies to the `intake` and `build` agents and the main session. The goal: **fail fast, log it,
+never spin.**
+
+- **Bounded retries.** When a step fails (a tool error, a failed `npm run build`, a screenshot
+  that won't capture), retry with a **materially different** fix **at most twice**. If two
+  distinct approaches both fail, **stop and escalate** with what you tried — don't invent
+  variations in a loop. Prefer the cheapest fix first.
+- **Scope & tokens.** Touch only the target client's folder / this phase's files. Read the
+  specific part of a file you need instead of re-scanning the repo. If a subtask balloons, pause
+  and report progress rather than pressing on silently.
+- **Log real problems** to [`logs/README.md`](logs/README.md) — especially when you give up
+  (`BLOCKED`) or work around something (`WORKAROUND`) — in the format defined there. Reference
+  the client by **slug only**; never write PII, keys, or tokens into the log. A non-blocking
+  failure: log it, say you're skipping it, and continue.

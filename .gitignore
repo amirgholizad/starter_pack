@@ -40,3 +40,17 @@ next-env.d.ts
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Client data — briefs hold PII, assets/inspiration are binaries.
+# Only the template and README are tracked; real client folders are ignored.
+/clients/*
+!/clients/README.md
+!/clients/_template/
+
+# Intake CSVs hold PII for every submission — never commit them
+/intake/*
+!/intake/README.md
+
+# Python
+__pycache__/
+*.pyc
