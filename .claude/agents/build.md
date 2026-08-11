@@ -15,10 +15,14 @@ verify they build.
   and stop.
 
 ## Read first — this is NOT standard Next.js
-Before writing any code, read the relevant guides in `node_modules/next/dist/docs/` and obey
-`AGENTS.md`. This version has breaking changes vs. older Next.js — don't reach for patterns
-from memory. Stack is fixed: **Next.js (App Router) · TypeScript · Tailwind · shadcn** — no
-other UI kit, no database.
+Before writing any code, read the relevant guides in `node_modules/next/dist/docs/`, read the
+**`web-conventions` skill** (`.claude/skills/web-conventions/`) — the authoritative house
+standard for everything under `src/` — and obey `AGENTS.md`. This version has breaking changes
+vs. older Next.js — don't reach for patterns from memory. Stack is fixed: **Next.js (App
+Router) · TypeScript · Tailwind · shadcn** — no other UI kit, no database.
+
+Check `AGENTS.md` → *What already ships in `src/`* before creating a file: constants, SEO,
+validators, sitemap/robots, the contact form, and `Reveal` are already there to fill in.
 
 ## Procedure
 
@@ -67,10 +71,14 @@ other UI kit, no database.
      (the contact form, any client-side motion).
    - **Motion:** `framer-motion` is installed (`import { motion } from "framer-motion"`) — use
      it for the §4 animations (entrance/stagger, scroll reveal, hover); it needs `"use client"`.
-     Reach for plain Tailwind / `tw-animate-css` on simple transitions. Keep motion tasteful,
-     not gratuitous.
-   - **Real copy:** use the brief's content. Never invent testimonials, awards, or facts. Where
-     copy is missing, use restrained placeholder text and note it in your summary.
+     For scroll reveal use the existing `<Reveal>` (`src/components/reveal.tsx`) rather than a
+     bare `whileInView` — it carries the `data-reveal` hook for the `<noscript>` fallback in
+     `layout.tsx`, without which the section renders blank when JS is blocked. Reach for plain
+     Tailwind / `tw-animate-css` on simple transitions. Keep motion tasteful, not gratuitous.
+   - **Real copy:** use the brief's content. Where copy is missing, use restrained placeholder
+     text and note it in your summary. **Never invent testimonials, reviews, ratings, awards,
+     or statistics** — see `AGENTS.md` → *Never fabricate content*. A testimonials section with
+     no real reviews yet gets an empty state, not filler.
 
 6. **Assets.** Copy `clients/<slug>/assets/*` into `public/images/` with URL-safe names and
    point every image `src` there. The shipped app uses **local** assets only (the inspiration
@@ -78,19 +86,33 @@ other UI kit, no database.
    logo is a real image (`logo.*`); if §2 says a logo exists but only a PDF/screenshot is
    present, ask for the image file before finishing the header.
 
-7. **Contact form (if §5 asks for one).** Wire it to **Web3Forms** per the pattern in
-   `AGENTS.md` → *Contact forms* — a `"use client"` form using `useWeb3forms`, with the
-   `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` env var and a hidden `botcheck` honeypot. There is **no
-   database** — do not add one. Remind the user in your summary to create a free Web3Forms key
-   for the client's destination inbox (§5) and put it in `.env.local`.
+7. **Contact form (if §5 asks for one).** `src/components/contact-form.tsx` already exists as
+   the reference implementation — **restyle it, don't rewrite it.** Keep its four behaviors
+   (zod validation, access-key guard, `botcheck` honeypot, toasts on both paths); see
+   `AGENTS.md` → *Contact forms*. There is **no database** — do not add one. Remind the user in
+   your summary to create a free Web3Forms key for the client's destination inbox (§5).
+   If the site needs no form, delete the file.
 
-8. **Verify — do not skip.** Run `npm run build` (authoritative for this Next) and fix **every**
+8. **Ship checklist.** Before verifying, walk this list:
+   - `package.json` `"name"` renamed from `starter_pack` to the client slug.
+   - `src/lib/constants.ts` — real `site` values and the `routes` you actually built.
+   - `src/lib/seo.ts` — real title/description, the right schema.org `@type` in
+     `businessJsonLd`, and **`formatDetection` left in place**. Drop JSON-LD fields the brief
+     gives you no real value for.
+   - `src/app/sitemap.ts` — one entry per real route, no leftovers.
+   - `NEXT_PUBLIC_SITE_URL` — flag in your summary that it must be set (in `.env.local` **and**
+     the Vercel production env) once the client's domain is purchased; until then every
+     canonical, OG tag, sitemap entry, and JSON-LD URL points at the placeholder origin.
+   - No fabricated reviews/awards/stats anywhere.
+   - `npm run format`, then `npm run format:check` clean.
+
+9. **Verify — do not skip.** Run `npm run build` (authoritative for this Next) and fix **every**
    error: missing deps, wrong import paths, server/client boundary mistakes. Then `npm run dev`
    and confirm each route renders. Don't report success until the build is clean.
 
-9. **Summarize.** Routes created, section components, shadcn items added, deps installed, assets
-   copied, and any follow-ups (e.g. "create the Web3Forms key", missing copy, a reference that
-   couldn't be screenshotted).
+10. **Summarize.** Routes created, section components, shadcn items added, deps installed,
+    assets copied, and any follow-ups (e.g. "create the Web3Forms key", "set
+    `NEXT_PUBLIC_SITE_URL`", missing copy, a reference that couldn't be screenshotted).
 
 ## Rules
 - Follow `AGENTS.md`: **shadcn only** (no other UI kit), **Tailwind** for styling, **Web3Forms**

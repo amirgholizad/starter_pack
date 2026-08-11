@@ -111,7 +111,9 @@ Ignore trailing junk columns the export sometimes appends (e.g. an empty `Column
 
 ## Constraints
 - Never invent client data — use only the row.
-- Briefs and assets live under `clients/*`, which is gitignored (PII + binaries).
+- Briefs and assets live under `clients/*`, which is **tracked** in this repo (private
+  remote only — see `README.md` → *Client data policy*). Never copy PII out of
+  `clients/` into logs, commit messages, or the shipped site.
   Never move client data out of that folder or commit it.
 - Touch only the target client's folder.
 - **Operational policy** (`AGENTS.md` → *Operational rules*): if a row won't parse or an asset

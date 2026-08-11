@@ -12,5 +12,7 @@ The agent reads the CSV from this folder, then for that client:
 
 Then the **build** agent turns the brief into the real site.
 
-> CSV files dropped here are **gitignored** — they contain PII for every submission and
-> must never be committed. Only this README is tracked.
+> ⚠️ CSV files dropped here are **tracked in git** (see README → *Client data policy*).
+> They contain PII for **every** form submission, not just the client you're building for,
+> and git history is permanent — so this repo's remote **must be private**. The
+> `deploy-prod` workflow strips `intake/` from the public `prod` branch.

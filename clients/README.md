@@ -1,8 +1,10 @@
 # Clients
 
 One folder per client: `clients/<slug>/` with a `brief.md` and an `assets/` folder.
-Everything here except `_template/` and this README is **gitignored** — briefs hold PII
-and assets are large binaries.
+Client folders here are **tracked in git**, so the work survives outside one machine —
+see [README → Client data policy](../README.md#client-data-policy). Briefs hold client
+PII, so this only holds on a **private remote**; the `deploy-prod` workflow strips
+`clients/` from the public `prod` branch. Assets are large binaries — watch repo size.
 
 ## Onboard a client
 
