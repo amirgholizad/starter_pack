@@ -30,9 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — real secrets never get committed, but the template always is.
+# Keep the negation: if the rules above are ever widened to `.env*`, an already-
+# tracked .env.example silently stops being tracked in a fresh clone.
 .env
 .env*.local
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -41,15 +44,19 @@ next-env.d.ts
 # Local Claude Code settings
 .claude/settings.local.json
 
-# Client data — briefs hold PII, assets/inspiration are binaries.
-# Only the template and README are tracked; real client folders are ignored.
-/clients/*
-!/clients/README.md
-!/clients/_template/
-
-# Intake CSVs hold PII for every submission — never commit them
-/intake/*
-!/intake/README.md
+# Client data is TRACKED — deliberate policy, see README -> "Client data policy".
+# `clients/`, `intake/`, and `designs/` are version-controlled so client work
+# survives outside one machine.
+#
+# THIS ONLY HOLDS IF THE REMOTE IS PRIVATE. Briefs hold client PII and
+# `intake/*.csv` holds PII for *every* form submission, not just the client
+# you're building for — and git history is permanent, so a repo that is public
+# even briefly cannot be un-leaked by a later commit. Before adding a remote:
+#   1. confirm it is private, and
+#   2. keep the `deploy-prod` workflow's STRIP_PATHS as the thing that keeps
+#      this material off the public `prod` branch.
+# Inspiration screenshots are large binaries; they are reference material and
+# are not shipped, so keep an eye on repo size.
 
 # Python
 __pycache__/

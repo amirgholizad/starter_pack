@@ -1,0 +1,18 @@
+# Prettier owns the shipped site (src/, configs) and the root docs.
+#
+# Everything below is pipeline instructions or records rather than source, and
+# reflowing it only creates diff noise:
+#   - logs/     append-only problem log; rewrapping past entries rewrites history
+#   - .claude/  agent + skill prompts, hand-wrapped for readability
+#   - clients/, intake/  client material and the brief template the intake agent fills
+logs/
+.claude/
+clients/
+intake/
+
+# Generated / vendored
+.next/
+node_modules/
+package-lock.json
+public/
+next-env.d.ts
