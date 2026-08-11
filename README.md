@@ -139,7 +139,7 @@ Set `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` in the Vercel
 .github/workflows/     # deploy-prod.yml
 clients/               # per-client brief + assets (tracked — private remote only)
 intake/                # drop Google Form CSVs here (tracked — holds PII)
-logs/                  # agent problem log + starter_pack back-port queue
+logs/                  # agent problem log
 scripts/               # snap.sh, fetch-drive-assets.py
 src/
   app/                 # routes (App Router) — layout.tsx, page.tsx, sitemap.ts, robots.ts
