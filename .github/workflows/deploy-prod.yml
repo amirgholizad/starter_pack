@@ -1,0 +1,101 @@
+name: Deploy prod
+
+# Promote the current `dev` tree to `prod` (minus the internal pipeline files),
+# then build & deploy that tree to Vercel via the CLI.
+#
+# Deploying from the CLI here — rather than Vercel's Git integration — means we
+# fully control *what* and *when* to ship, and don't depend on Vercel being able
+# to scope auto-deploys to a single branch.
+#
+# `prod` is a GENERATED snapshot of `dev`: it is force-updated on every release
+# and is NEVER merged back into `dev`. Because the two branches share no ongoing
+# history, they can't drift and you never hit modify/delete conflicts — unlike a
+# `dev -> prod` merge, where deleting `clients/`, `designs/`, etc. on `prod`
+# conflicts with every change to those paths on `dev`. Two merge-based
+# approaches were tried before this one; don't reintroduce them.
+#
+# REQUIRED REPO SECRETS — without all three this dies at `vercel pull`, after
+# it has already force-pushed prod:
+#   VERCEL_TOKEN        Account settings -> Tokens
+#   VERCEL_ORG_ID       .vercel/project.json after `vercel link`
+#   VERCEL_PROJECT_ID   .vercel/project.json after `vercel link`
+on:
+  workflow_dispatch: {} # click "Run workflow" in the Actions tab, or: gh workflow run deploy-prod.yml
+  # push:
+  #   branches: [dev]   # uncomment to auto-deploy on every push to dev
+
+# Never run two prod deploys at once; let an in-flight one finish.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+# Needed to force-push the regenerated prod branch.
+permissions:
+  contents: write
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  # Paths stripped from the public `prod` snapshot — the pipeline's internals and
+  # any client material. Whitespace-separated; a client repo can extend this list
+  # in one place. Keep `clients`, `intake`, and `designs` here: this repo tracks
+  # them (see README -> "Client data policy"), so `prod` is what keeps that
+  # material off the public branch.
+  STRIP_PATHS: >-
+    AGENTS.md
+    CLAUDE.md
+    .mcp.json
+    scripts
+    .claude
+    clients
+    designs
+    intake
+    logs
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      # Rebuild prod = "dev minus internal files" as a single fresh commit and
+      # force-push it, so the prod branch on GitHub is a clean public snapshot.
+      # `git checkout -B prod` repoints the branch at dev without touching the
+      # working tree; `git rm` then strips the internal paths from tree + index.
+      # --ignore-unmatch so a gitignored/absent path never fails the run.
+      - name: Build clean prod snapshot and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B prod
+          git rm -r --quiet --ignore-unmatch $STRIP_PATHS
+          if git diff --cached --quiet; then
+            echo "Nothing to strip — dev already carries no internal files."
+          else
+            git commit -m "chore(prod): publish dev without internal files"
+          fi
+          git push --force origin prod
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Everything below builds & deploys the STRIPPED tree still checked out
+      # in the workspace (identical to what we just pushed to prod).
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build with Vercel
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel (production)
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
