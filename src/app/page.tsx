@@ -9,9 +9,7 @@ export default function Home() {
         </h1>
         <p className="max-w-md text-lg text-muted-foreground">
           A minimal starter. Edit{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">
-            src/app/page.tsx
-          </code>{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">src/app/page.tsx</code>{" "}
           to get going.
         </p>
       </div>
