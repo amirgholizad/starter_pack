@@ -1,4 +1,6 @@
-@import "tailwindcss";
+/* Detect classes in src/ only. By default Tailwind scans the whole repo, so words in
+   skill docs and client briefs ("invert", "isolate") shipped as unused CSS. */
+@import "tailwindcss" source("..");
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 

@@ -24,6 +24,25 @@ Router) · TypeScript · Tailwind · shadcn** — no other UI kit, no database.
 Check `AGENTS.md` → *What already ships in `src/`* before creating a file: constants, SEO,
 validators, sitemap/robots, the contact form, and `Reveal` are already there to fill in.
 
+## Design method — impeccable
+Design with the **impeccable** skill. Read `AGENTS.md` → *Design: the impeccable skill* (which
+house rules beat impeccable's defaults), then run
+`.claude/skills/impeccable/scripts/impeccable context` once and follow its directives. Read
+`.claude/skills/impeccable/reference/new-work.md` for the method (a marketing site's pages are
+**Persuade** surfaces: `reference/mode-persuade.md`), and `reference/craft-floor.md` right before
+your first UI edit. These pipeline bindings override new-work's defaults:
+- **New world, every time.** The template's placeholder page and stock theme are not an
+  incumbent design; build the client's world from the brief.
+- **The brief is the interview.** It answers new-work's §2 questions; your step-4 plan is the one
+  confirmation round.
+- **The brief pins the direction.** With a §4 Developer style-match, skip `concept-seed`: the
+  style-match is the direction. Without one, run new-work's direction round, holding every
+  specific client reference as a pinned constraint; the page the user answers replaces the
+  step-4 pause.
+- **Code-led.** There's no image generation here, so no comps or plates.
+- **Hand the finish to `/new-site`.** You can't spawn subagents, so don't run (or simulate) the
+  finish reviewer or documenter; the main session runs them after you return.
+
 ## Procedure
 
 1. **Read the brief.** Pull out: the **page list** (§3), **design direction** (§4 — vibe
@@ -59,7 +78,11 @@ validators, sitemap/robots, the contact form, and `Reveal` are already there to 
    those sections** (don't omit any). Give the user a short plan — routes, palette/type, and how
    you'll echo the inspiration — and **pause for a quick OK before building** (cheap insurance
    against building the wrong direction). Don't wait for approval on every detail; one plan
-   check is enough.
+   check is enough. Write the direction as impeccable's **direction contract** (new-work §5:
+   THESIS, OWN-WORLD, STORY, FIRST VIEWPORT, FORM, FINISH) with
+   `.claude/skills/impeccable/scripts/impeccable surface-brief write src/app/page.tsx <file>`;
+   on a pinned build, FORM reads `seed: none (brief-pinned: <style-match URL>)`. The contract
+   plus the route list is the plan you show.
 
 5. **Build each page.** Compose pages from reusable section components under
    `src/components/` (e.g. `Hero`, `Features`, `ContactSection`), styled with **Tailwind** to
@@ -79,6 +102,9 @@ validators, sitemap/robots, the contact form, and `Reveal` are already there to 
      text and note it in your summary. **Never invent testimonials, reviews, ratings, awards,
      or statistics** — see `AGENTS.md` → *Never fabricate content*. A testimonials section with
      no real reviews yet gets an empty state, not filler.
+   - **Design hook findings:** triage per `.claude/skills/impeccable/reference/hooks.md` — fix
+     real problems; a finding that contradicts a brief pin is a sanctioned exception
+     (`impeccable hooks ignore-value <rule> <value> --reason "brief: <pin>"`).
 
 6. **Assets.** Copy `clients/<slug>/assets/*` into `public/images/` with URL-safe names and
    point every image `src` there. The shipped app uses **local** assets only (the inspiration
@@ -109,10 +135,19 @@ validators, sitemap/robots, the contact form, and `Reveal` are already there to 
 9. **Verify — do not skip.** Run `npm run build` (authoritative for this Next) and fix **every**
    error: missing deps, wrong import paths, server/client boundary mistakes. Then `npm run dev`
    and confirm each route renders. Don't report success until the build is clean.
+   **Capture for the finish review:** stop the dev server, run `npm run start`, then
+   `node scripts/shot.mjs http://localhost:3000 .impeccable/review/desktop.png 1440` and the
+   same at `mobile.png` / `390` (other routes: `desktop-<route>.png`, `mobile-<route>.png`).
+   Open every capture and confirm it shows the whole page, with no blank sections. If
+   `impeccable context` printed `MANUAL_DETECTOR_REQUIRED`, run
+   `.claude/skills/impeccable/scripts/impeccable detect --json src` once and fix what's
+   mechanical.
 
 10. **Summarize.** Routes created, section components, shadcn items added, deps installed,
     assets copied, and any follow-ups (e.g. "create the Web3Forms key", "set
-    `NEXT_PUBLIC_SITE_URL`", missing copy, a reference that couldn't be screenshotted).
+    `NEXT_PUBLIC_SITE_URL`", missing copy, a reference that couldn't be screenshotted). For the
+    finish review, also list the direction-contract path, the capture paths, and any open
+    detector findings.
 
 ## Rules
 - Follow `AGENTS.md`: **shadcn only** (no other UI kit), **Tailwind** for styling, **Web3Forms**

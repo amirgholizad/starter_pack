@@ -7,20 +7,26 @@ thing end to end — no v0, no backend, no paid design tool.
 ## Pipeline
 
 ```
-intake → build
+intake → build → finish review
 ```
 
 - **intake** ([.claude/agents/intake.md](.claude/agents/intake.md)) — reads one
   row of the Google-Form CSV in `intake/` → fills `clients/<slug>/brief.md`
   (design direction + inspiration links) and downloads the client's Drive assets
-  (optional, needs rclone). **You review the brief** before building.
+  (optional, needs rclone). **You review the brief** before building; the main
+  session then derives `PRODUCT.md` from it with the impeccable skill.
 - **build** ([.claude/agents/build.md](.claude/agents/build.md)) — studies the
   brief's inspiration sites (**screenshot via `scripts/snap.sh` + fetched text
-  via WebFetch**), sets the brand theme, then designs and builds the pages into
-  `src/app/` with Tailwind + shadcn. Wires any contact form to Web3Forms and
-  verifies `npm run build`.
+  via WebFetch**), sets the brand theme, then designs (with impeccable) and
+  builds the pages into `src/app/` with Tailwind + shadcn. Wires any contact
+  form to Web3Forms, verifies `npm run build`, and captures desktop/mobile
+  screenshots with `scripts/shot.mjs`.
+- **finish review** — the main session runs impeccable's
+  `impeccable-finish-reviewer` on those screenshots (at most two fix rounds,
+  applied by the build agent), then `impeccable-documenter` writes `DESIGN.md`.
+  Both run from the main session because subagents can't spawn subagents.
 
-Run both with **`/new-site "Business Name"`**, or dispatch one agent at a time
+Run it all with **`/new-site "Business Name"`**, or dispatch one agent at a time
 (e.g. "run the build agent for `<slug>`"). Client briefs/assets live under
 `clients/<slug>/` and **are tracked in git** — see
 [README → Client data policy](README.md#client-data-policy). That only holds on
@@ -52,6 +58,46 @@ branch.
 - Path aliases (see `components.json`): `@/components`, `@/lib`,
   `@/components/ui`, `@/lib/utils`, `@/hooks`.
 - The `cn()` helper in `src/lib/utils.ts` merges class names.
+
+## Design: the impeccable skill
+
+The **impeccable** skill (`.claude/skills/impeccable/`, `/impeccable`) is the
+design layer: the build agent designs with it, and `/impeccable critique`,
+`polish`, `audit`, and the rest refine a built site. It keeps per-client design
+records: `PRODUCT.md` (product truth, derived from the brief), the direction
+contract (`.impeccable/surfaces/`), and `DESIGN.md` + `.impeccable/design.json`
+(the built design system). They're tracked in the client repo, skipped by
+Prettier, and stripped from `prod`.
+
+- **Not in the template.** Don't run `/impeccable init` or
+  `/impeccable document` here: every client clone would inherit the record. The
+  placeholder page and stock shadcn theme aren't an incumbent design; each
+  client build creates its own visual world from the brief.
+- **Who decides what.** House rules (this file, `web-conventions`) govern code.
+  The brief governs direction: a §4 Developer style-match pins it, so
+  impeccable's direction roll (`concept-seed`) is skipped. Impeccable governs
+  craft (`reference/craft-floor.md`) wherever the brief is silent.
+- **Where impeccable's defaults clash with a house rule, the house rule wins:**
+  - No fabrication beats "author demonstration content" and "no section is
+    omittable": no synthetic stats, reviews, or logos, even labeled. Render an
+    empty state or omit the section.
+  - shadcn-only beats "rebuild every atom": restyle the primitives in
+    `src/components/ui/` into the world's vocabulary; never hand-roll a
+    replacement or add another kit.
+  - Fonts load through `next/font`, never a Google Fonts `<link>`.
+  - Scroll reveals use `<Reveal>`. Browser-surface theming (`::selection`, focus
+    rings, scrollbars) goes in `globals.css`, never inline `style`.
+  - Imagery: the client's assets first. Anything else must be licensed for
+    commercial use, saved into `public/images/` (never hotlinked), and flagged
+    in the summary.
+- **Design hook.** The per-edit detector hook lives in the gitignored
+  `.claude/settings.local.json`, so a fresh clone has none until you run
+  `/impeccable hooks on`. Without it, `impeccable context` tells the build to
+  run the detector once at the end instead. Triage findings per
+  `reference/hooks.md`; a finding that contradicts a brief pin is a sanctioned
+  exception (`impeccable hooks ignore-value … --reason "brief: …"`).
+- **Screenshots of the local site** come from `node scripts/shot.mjs`;
+  `scripts/snap.sh` can't reach localhost.
 
 ## Contact forms (Web3Forms)
 
