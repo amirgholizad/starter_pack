@@ -17,10 +17,11 @@ intake → build → finish review
   session then derives `PRODUCT.md` from it with the impeccable skill.
 - **build** ([.claude/agents/build.md](.claude/agents/build.md)) — studies the
   brief's inspiration sites (**screenshot via `scripts/snap.sh` + fetched text
-  via WebFetch**), sets the brand theme, then designs (with impeccable) and
-  builds the pages into `src/app/` with Tailwind + shadcn. Wires any contact
-  form to Web3Forms, verifies `npm run build`, and captures desktop/mobile
-  screenshots with `scripts/shot.mjs`.
+  via WebFetch**), sets the brand theme, fills image gaps the client's assets
+  don't cover with licensed Pexels photos (`scripts/pexels.mjs`), then designs
+  (with impeccable) and builds the pages into `src/app/` with Tailwind + shadcn.
+  Wires any contact form to Web3Forms, verifies `npm run build`, and captures
+  desktop/mobile screenshots with `scripts/shot.mjs`.
 - **finish review** — the main session runs impeccable's
   `impeccable-finish-reviewer` on those screenshots (at most two fix rounds,
   applied by the build agent), then `impeccable-documenter` writes `DESIGN.md`.
@@ -87,7 +88,11 @@ Prettier, and stripped from `prod`.
   - Fonts load through `next/font`, never a Google Fonts `<link>`.
   - Scroll reveals use `<Reveal>`. Browser-surface theming (`::selection`, focus
     rings, scrollbars) goes in `globals.css`, never inline `style`.
-  - Imagery: the client's assets first. Anything else must be licensed for
+  - Imagery: the client's assets first. Gaps come from Pexels through
+    `scripts/pexels.mjs`, which self-hosts each photo, embeds its origin, and
+    logs it in `clients/<slug>/stock-photos.md`. Its key,
+    `PEXELS_SEARCH_API_KEY`, is a build-time key in `.env` / `.env.local`: never
+    `NEXT_PUBLIC_`, never needed on Vercel. Anything else must be licensed for
     commercial use, saved into `public/images/` (never hotlinked), and flagged
     in the summary.
 - **Design hook.** The per-edit detector hook is committed in
@@ -152,7 +157,9 @@ placeholder data flagged in a comment. It renders as a genuine claim to every
 visitor and is one forgotten task away from being a lie on a live site. If the
 data doesn't exist yet, render an **empty state** (e.g. a "be our first review"
 CTA) or omit the section, and flag the gap in your summary. Restrained
-placeholder _copy_ is fine; fake facts are not.
+placeholder _copy_ is fine; fake facts are not. The same goes for photos: stock
+imagery can set the scene, but never stands in for the client's own team,
+premises, products, or results.
 
 ## Operational rules (all agents)
 

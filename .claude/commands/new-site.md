@@ -23,8 +23,9 @@ Run the phases in order, reporting a one-line status before moving on:
 3. **Build** (`build` agent) — study each inspiration site in the brief (screenshot + fetched
    text), set the brand theme, then design (with impeccable) and build the pages into `src/app/`
    with Tailwind + shadcn. It will show me its design plan (impeccable's direction contract, or
-   impeccable's direction-round page when the brief has no Developer style-match) and pause for a
-   quick OK before writing pages. Wire any contact form to Web3Forms. Verify `npm run build` is
+   impeccable's direction-round page when the brief has no Developer style-match), including an
+   imagery plan (client assets first, Pexels queries for the gaps), and pause for a quick OK
+   before writing pages. Wire any contact form to Web3Forms. Verify `npm run build` is
    clean and capture `.impeccable/review/desktop.png` and `mobile.png`.
 
 4. **Finish review** (`impeccable-finish-reviewer` agent, spawned fresh) — build its packet per
@@ -44,7 +45,8 @@ Run the phases in order, reporting a one-line status before moving on:
    `.claude/skills/impeccable/reference/document.md`.
 
 Finish by reporting the routes and components created, the reviewer's disposition word, and any
-follow-ups (e.g. create the Web3Forms key).
+follow-ups (e.g. create the Web3Forms key, swap the stock photos logged in
+`clients/<slug>/stock-photos.md` for client photography).
 
 Never skip the brief-review pause. If the build's inputs are missing (no brief), stop and tell
 me to run intake first.

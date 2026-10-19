@@ -75,6 +75,8 @@ Claude Code session.
 | `scripts/snap.sh <url> <out.png>`                 | Screenshot an inspiration URL to a local PNG                                |
 | `node scripts/shot.mjs <url> <out.png> [width]`   | Full-page screenshot of a local page (reveals played) for the design review |
 | `python scripts/fetch-drive-assets.py <brief.md>` | Download a client's Drive assets (needs rclone)                             |
+| `node scripts/pexels.mjs search "<query>"`        | Search Pexels stock photos; renders a numbered contact sheet to pick from   |
+| `node scripts/pexels.mjs get <id> <out.jpg>`      | Self-host a Pexels photo with its origin embedded (`--log` records it)      |
 
 Prettier owns `src/` and the root docs. The pipeline's own prompts and records
 (`.claude/`, `logs/`, `clients/`, `intake/`, and impeccable's `PRODUCT.md`,
@@ -152,7 +154,7 @@ Set `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` in the Vercel
 clients/               # per-client brief + assets (tracked — private remote only)
 intake/                # drop Google Form CSVs here (tracked — holds PII)
 logs/                  # agent problem log
-scripts/               # snap.sh, shot.mjs, fetch-drive-assets.py
+scripts/               # snap.sh, shot.mjs, pexels.mjs, fetch-drive-assets.py
 src/
   app/                 # routes (App Router) — layout.tsx, page.tsx, sitemap.ts, robots.ts
   components/          # contact-form.tsx (reference impl), reveal.tsx

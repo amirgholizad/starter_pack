@@ -75,8 +75,11 @@ your first UI edit. These pipeline bindings override new-work's defaults:
 4. **Plan the pages, then confirm.** Map each brief page to a route: Home → `src/app/page.tsx`,
    About → `src/app/about/page.tsx`, etc. List the sections each page needs (hero, features,
    testimonials, gallery, contact, footer, …) and a header **nav that links to every one of
-   those sections** (don't omit any). Give the user a short plan — routes, palette/type, and how
-   you'll echo the inspiration — and **pause for a quick OK before building** (cheap insurance
+   those sections** (don't omit any). Include an **imagery plan**: every image slot those sections
+   need, each marked with its source — a client asset (`clients/<slug>/assets/…`), a Pexels
+   search query for a gap (step 5), or "waits for client photo". Give the user a short plan —
+   routes, palette/type, imagery, and how you'll echo the inspiration — and **pause for a quick
+   OK before building** (cheap insurance
    against building the wrong direction). Don't wait for approval on every detail; one plan
    check is enough. Write the direction as impeccable's **direction contract** (new-work §5:
    THESIS, OWN-WORLD, STORY, FIRST VIEWPORT, FORM, FINISH) with
@@ -84,7 +87,38 @@ your first UI edit. These pipeline bindings override new-work's defaults:
    on a pinned build, FORM reads `seed: none (brief-pinned: <style-match URL>)`. The contract
    plus the route list is the plan you show.
 
-5. **Build each page.** Compose pages from reusable section components under
+5. **Imagery — client assets first, Pexels for the gaps.** Do this before page code: the photos
+   drive the overlay, contrast, and crop decisions the sections are built around.
+   - **Client assets.** Copy `clients/<slug>/assets/*` into `public/images/` with URL-safe names
+     and point every image `src` there. The shipped app uses **local** assets only (the
+     inspiration screenshots in `clients/<slug>/inspiration/` are references — never ship them).
+     Confirm the logo is a real image (`logo.*`); if §2 says a logo exists but only a
+     PDF/screenshot is present, ask for the image file before finishing the header.
+   - **Gaps → Pexels.** For each slot the approved imagery plan gives a Pexels query, use
+     `scripts/pexels.mjs` (key: `PEXELS_SEARCH_API_KEY` in `.env` / `.env.local`):
+     1. `node scripts/pexels.mjs search "<query>" --orientation <landscape|portrait|square>` —
+        query the subject's physical object, not the category ("flour-dusted sourdough on a
+        bench", not "bakery"); add `--color <#hex>` to pull toward the theme. **Read the contact
+        sheet it prints and pick by eye** — Pexels returns loosely related results even for a
+        bad query, so never take #1 blindly. Judge subject, light, room for overlaid text, and
+        one consistent grade across the page.
+     2. `node scripts/pexels.mjs get <id> public/images/stock/<slot>.jpg --log clients/<slug>/stock-photos.md`
+        — saves a self-hosted copy (never hotlink `images.pexels.com`), embeds its origin for
+        impeccable's provenance scan, and logs it. Write the page's own alt text; the printed
+        Pexels alt is only a starting point.
+   - **Stock is atmosphere, never evidence.** A stock photo may show the subject matter, setting,
+     or materials. It never stands in for the client's own people, premises, vehicles, products,
+     or results — no stock "our team", "our shop", portfolio, before/after, or testimonial
+     portraits. That is fabrication (`AGENTS.md` → *Never fabricate content*), and the Pexels
+     License forbids implying a pictured person endorses the business. Those slots wait for
+     client photos: omit them or give them a non-photographic treatment, and list them in the
+     summary.
+   - **Bounded.** At most two distinct queries per slot. If neither sheet has a fit, drop the
+     slot or go non-photographic rather than ship a weak photo — one decisive photo beats five
+     mediocre ones. If §7 says no stock photography, skip Pexels. If the script fails on the key
+     or the rate limit, log it per the operational policy and continue with client assets only.
+
+6. **Build each page.** Compose pages from reusable section components under
    `src/components/` (e.g. `Hero`, `Features`, `ContactSection`), styled with **Tailwind** to
    match the inspiration you studied. Rules:
    - **Real shadcn primitives.** Where a section needs a button/card/input/accordion/etc., add
@@ -106,12 +140,6 @@ your first UI edit. These pipeline bindings override new-work's defaults:
      real problems; a finding that contradicts a brief pin is a sanctioned exception
      (`impeccable hooks ignore-value <rule> <value> --reason "brief: <pin>"`).
 
-6. **Assets.** Copy `clients/<slug>/assets/*` into `public/images/` with URL-safe names and
-   point every image `src` there. The shipped app uses **local** assets only (the inspiration
-   screenshots in `clients/<slug>/inspiration/` are references — never ship them). Confirm the
-   logo is a real image (`logo.*`); if §2 says a logo exists but only a PDF/screenshot is
-   present, ask for the image file before finishing the header.
-
 7. **Contact form (if §5 asks for one).** `src/components/contact-form.tsx` already exists as
    the reference implementation — **restyle it, don't rewrite it.** Keep its four behaviors
    (zod validation, access-key guard, `botcheck` honeypot, toasts on both paths); see
@@ -129,7 +157,10 @@ your first UI edit. These pipeline bindings override new-work's defaults:
    - `NEXT_PUBLIC_SITE_URL` — flag in your summary that it must be set (in `.env.local` **and**
      the Vercel production env) once the client's domain is purchased; until then every
      canonical, OG tag, sitemap entry, and JSON-LD URL points at the placeholder origin.
-   - No fabricated reviews/awards/stats anywhere.
+   - No fabricated reviews/awards/stats anywhere, and no stock photo posing as the client's own.
+   - `.claude/skills/impeccable/scripts/impeccable embed-prompt --scan public/images` reports
+     nothing missing. Pexels downloads already carry their origin; for each client asset run
+     `impeccable embed-prompt <file> --prompt "origin: client-supplied, clients/<slug>/assets/<name>"`.
    - `npm run format`, then `npm run format:check` clean.
 
 9. **Verify — do not skip.** Run `npm run build` (authoritative for this Next) and fix **every**
@@ -144,8 +175,10 @@ your first UI edit. These pipeline bindings override new-work's defaults:
    mechanical.
 
 10. **Summarize.** Routes created, section components, shadcn items added, deps installed,
-    assets copied, and any follow-ups (e.g. "create the Web3Forms key", "set
-    `NEXT_PUBLIC_SITE_URL`", missing copy, a reference that couldn't be screenshotted). For the
+    assets copied, stock photos used (point to `clients/<slug>/stock-photos.md` — each is a
+    candidate to swap for client photography), and any follow-ups (e.g. "create the Web3Forms
+    key", "set `NEXT_PUBLIC_SITE_URL`", missing copy, image slots waiting for client photos, a
+    reference that couldn't be screenshotted). For the
     finish review, also list the direction-contract path, the capture paths, and any open
     detector findings.
 
@@ -154,7 +187,8 @@ your first UI edit. These pipeline bindings override new-work's defaults:
   for forms (no database).
 - Match the inspiration you actually looked at — don't design from the client's adjectives alone.
 - Build clean, reusable components; don't dump one giant `page.tsx`.
-- Don't invent content — use the brief. Keep client assets local.
+- Don't invent content — use the brief. Keep every image local — client assets and Pexels
+  downloads alike; never hotlink.
 - Verify with a real `npm run build` before claiming success — unresolved imports and broken
   server/client boundaries are the most common failures.
 - Touch only this client's app within the project; the inspiration/assets stay under `clients/*`.
