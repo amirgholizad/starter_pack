@@ -40,7 +40,8 @@ env:
   # any client material. Whitespace-separated; a client repo can extend this list
   # in one place. Keep `clients`, `intake`, and `designs` here: this repo tracks
   # them (see README -> "Client data policy"), so `prod` is what keeps that
-  # material off the public branch.
+  # material off the public branch. PRODUCT.md, DESIGN.md, and `.impeccable` are
+  # the impeccable skill's per-client design records (derived from the brief).
   STRIP_PATHS: >-
     AGENTS.md
     CLAUDE.md
@@ -51,6 +52,9 @@ env:
     designs
     intake
     logs
+    PRODUCT.md
+    DESIGN.md
+    .impeccable
 
 jobs:
   deploy:

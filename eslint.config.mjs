@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Pipeline prompts and skills (impeccable ships bundled browser scripts) and
+    // impeccable's working files — not site source.
+    ".claude/**",
+    ".impeccable/**",
   ]),
 ]);
 

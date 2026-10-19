@@ -5,10 +5,15 @@
 #   - logs/     append-only problem log; rewrapping past entries rewrites history
 #   - .claude/  agent + skill prompts, hand-wrapped for readability
 #   - clients/, intake/  client material and the brief template the intake agent fills
+#   - .impeccable/, PRODUCT.md, DESIGN.md  the impeccable skill's design records;
+#     it writes and re-reads them itself (DESIGN.md's YAML frontmatter is parsed)
 logs/
 .claude/
 clients/
 intake/
+.impeccable/
+PRODUCT.md
+DESIGN.md
 
 # Generated / vendored
 .next/

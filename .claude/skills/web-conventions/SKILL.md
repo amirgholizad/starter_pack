@@ -19,6 +19,11 @@ When a rule below can't apply (e.g. the site has no backend / server actions),
 skip that rule — don't invent infrastructure. But the **form**, **validation**,
 **file-layout**, and **formatting** rules apply to every site.
 
+Design decisions (layout, color, type, motion, imagery) come from the client's
+brief and the **impeccable** skill. This skill governs how the code is written;
+where impeccable's guidance would break a rule here (another UI kit, inline
+styles, fabricated content), the rule here wins.
+
 ## Stack
 
 - **Next.js App Router** + **React 19** + **TypeScript** (strict).
