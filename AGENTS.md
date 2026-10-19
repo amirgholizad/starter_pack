@@ -90,12 +90,12 @@ Prettier, and stripped from `prod`.
   - Imagery: the client's assets first. Anything else must be licensed for
     commercial use, saved into `public/images/` (never hotlinked), and flagged
     in the summary.
-- **Design hook.** The per-edit detector hook lives in the gitignored
-  `.claude/settings.local.json`, so a fresh clone has none until you run
-  `/impeccable hooks on`. Without it, `impeccable context` tells the build to
-  run the detector once at the end instead. Triage findings per
-  `reference/hooks.md`; a finding that contradicts a brief pin is a sanctioned
-  exception (`impeccable hooks ignore-value … --reason "brief: …"`).
+- **Design hook.** The per-edit detector hook is committed in
+  `.claude/settings.json`, so every clone runs it. `/impeccable hooks off` turns
+  it off for a project; the build then runs the detector once at the end
+  instead. Triage findings per `reference/hooks.md`; a finding that contradicts
+  a brief pin is a sanctioned exception
+  (`impeccable hooks ignore-value … --reason "brief: …"`).
 - **Screenshots of the local site** come from `node scripts/shot.mjs`;
   `scripts/snap.sh` can't reach localhost.
 

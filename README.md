@@ -53,9 +53,10 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-In each new clone, run `/impeccable hooks on` once inside Claude Code to turn on
-impeccable's per-edit design checks. They live in the gitignored
-`.claude/settings.local.json`, so clones don't inherit them.
+Impeccable's design checks run automatically after each UI edit (the hook in
+`.claude/settings.json`). The first run on a machine downloads its engine (~16
+MB, cached in `~/.impeccable/`); `/impeccable hooks off` turns the checks off
+for a project.
 
 To build a client site: drop their Google Form CSV export into
 [`intake/`](intake/README.md), then run `/new-site "Business Name"` inside a
@@ -146,6 +147,7 @@ Set `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` in the Vercel
 .claude/agents/        # intake + build agents, plus impeccable's reviewer/documenter/helpers
 .claude/commands/      # /new-site pipeline command
 .claude/skills/        # web-conventions (house code standards), impeccable (design), doc-coauthoring
+.claude/settings.json  # shared Claude Code settings: impeccable's design hook
 .github/workflows/     # deploy-prod.yml
 clients/               # per-client brief + assets (tracked — private remote only)
 intake/                # drop Google Form CSVs here (tracked — holds PII)
