@@ -32,6 +32,8 @@ styles, fabricated content), the rule here wins.
 - **Tailwind** for styling — no inline `style` hacks. Use the `cn()` helper.
 - **zod** for all schema validation. **react-hook-form** + `@hookform/resolvers`
   for forms. **sonner** for toasts. **lucide-react** for icons.
+- **framer-motion** and **GSAP** for motion, each with its own job (see
+  [Motion](#motion-framer-motion--gsap)).
 
 ## File & component conventions
 
@@ -196,6 +198,75 @@ export const routes = {
 `src/lib/constants.ts` ships in this repo pre-stubbed — fill in the real values
 from the brief rather than starting a new file.
 
+## Motion: framer-motion + GSAP
+
+Both are installed, and each owns a different job. Choose by the job:
+
+| Job                                                                          | Library                           |
+| ---------------------------------------------------------------------------- | --------------------------------- |
+| A section entering as it scrolls into view                                   | framer-motion, through `<Reveal>` |
+| Hover and tap, mount/unmount (`AnimatePresence`), layout changes             | framer-motion                     |
+| Anything tied to scroll **position**: scrub, pin, parallax, a scrubbed video | GSAP ScrollTrigger                |
+| A choreographed multi-step timeline, SplitText, SVG drawing or morphing      | GSAP                              |
+
+- **Import GSAP from `@/lib/gsap`**, never from `gsap` directly: plugins are
+  registered there, once. Run it in a `"use client"` component inside
+  `useGSAP(() => …, { scope: ref })`, which reverts every tween and
+  ScrollTrigger on unmount. The `gsap-*` skills cover the API (`gsap-react`,
+  `gsap-scrolltrigger`, `gsap-timeline`, `gsap-plugins`).
+- **One library per element.** Both write inline `transform` and `opacity`, so
+  two on one node fight every frame. If an element needs both, nest them:
+  framer-motion on the wrapper, GSAP on a child.
+- **Never pin inside a transform.** ScrollTrigger pins with `position: fixed`,
+  which any transformed ancestor breaks. A pinned section never sits inside
+  `<Reveal>` or another `motion.*` element.
+- **Reduced motion.** `MotionProvider` in the root layout covers framer-motion.
+  GSAP scroll effects go inside `gsap.matchMedia()` under `motionOk`, so
+  reduced-motion visitors get the static layout (`useGSAP` reverts the
+  matchMedia with everything else):
+
+```tsx
+"use client";
+
+import { useRef } from "react";
+import { gsap, motionOk, useGSAP } from "@/lib/gsap";
+
+export function Gallery() {
+  const ref = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      gsap.matchMedia().add(motionOk, () => {
+        gsap.to(".gallery-track", {
+          xPercent: -50,
+          ease: "none",
+          scrollTrigger: { trigger: ref.current, pin: true, scrub: true },
+        });
+      });
+    },
+    { scope: ref }
+  );
+
+  return <section ref={ref}>{/* … */}</section>;
+}
+```
+
+- **Visible by default.** Never hide an element in CSS for GSAP to reveal. Use
+  `gsap.from()` / `fromTo()` so the server-rendered HTML is the finished state:
+  the page stays whole with JS blocked, under reduced motion, and in
+  `scripts/shot.mjs` captures (which run with reduced motion). Entrances above
+  the fold stay with framer-motion, which renders its start state on the server
+  instead of flashing the finished one first.
+- **Media for a GSAP moment** follows the imagery rule: the client's assets
+  first, then Pexels. A scroll-scrubbed video comes from
+  `node scripts/pexels.mjs get-video <id> public/videos/stock/<slot>.mp4 --scrub`
+  (trim with `--start` / `--duration`; keep it near 5 MB). It also writes
+  `<slot>.jpg`, the `poster` and the reduced-motion still. Render
+  `<video muted playsInline preload="auto" poster=…>` and, in the ScrollTrigger's
+  `onUpdate`, set `currentTime = progress * duration`, skipping while `duration`
+  is still `NaN` (metadata not loaded yet). Waiting on `loadedmetadata` instead
+  would create the ScrollTrigger in a callback `useGSAP` never cleans up.
+
 ## Never fabricate social proof
 
 Never seed a client-facing component with **invented testimonials, reviews,
@@ -241,6 +312,8 @@ Add a `.prettierrc` with exactly these options and run prettier on every file:
 ## Pre-ship checklist
 
 - [ ] All zod schemas in `src/lib/validators.ts`, types via `z.infer`.
+- [ ] GSAP only through `@/lib/gsap` + `useGSAP`, scroll effects under
+      `motionOk`, and no element animated by both motion libraries.
 - [ ] Every form uses react-hook-form + zodResolver + shadcn `Form` +
       `FormMessage`.
 - [ ] Named exports; `"use client"` only where needed; kebab-case files.

@@ -17,11 +17,11 @@ intake → build → finish review
   session then derives `PRODUCT.md` from it with the impeccable skill.
 - **build** ([.claude/agents/build.md](.claude/agents/build.md)) — studies the
   brief's inspiration sites (**screenshot via `scripts/snap.sh` + fetched text
-  via WebFetch**), sets the brand theme, fills image gaps the client's assets
-  don't cover with licensed Pexels photos (`scripts/pexels.mjs`), then designs
-  (with impeccable) and builds the pages into `src/app/` with Tailwind + shadcn.
-  Wires any contact form to Web3Forms, verifies `npm run build`, and captures
-  desktop/mobile screenshots with `scripts/shot.mjs`.
+  via WebFetch**), sets the brand theme, fills media gaps the client's assets
+  don't cover with licensed Pexels photos and video (`scripts/pexels.mjs`), then
+  designs (with impeccable) and builds the pages into `src/app/` with Tailwind +
+  shadcn. Wires any contact form to Web3Forms, verifies `npm run build`, and
+  captures desktop/mobile screenshots with `scripts/shot.mjs`.
 - **finish review** — the main session runs impeccable's
   `impeccable-finish-reviewer` on those screenshots (at most two fix rounds,
   applied by the build agent), then `impeccable-documenter` writes `DESIGN.md`.
@@ -52,9 +52,12 @@ branch.
 - UI components come from **shadcn** only (no antd, no other UI kit). Add them
   with the shadcn CLI / MCP; they land in `src/components/ui/`.
 - **Tailwind** for all styling — no inline `style` hacks.
-- **Animations:** `framer-motion` is installed
-  (`import { motion } from "framer-motion"`); use it for entrance / scroll /
-  hover motion (client components only). Plain Tailwind / `tw-animate-css` is
+- **Animations:** `framer-motion` and **GSAP** are both installed, each with its
+  own job (rules: `web-conventions` → _Motion_). framer-motion does entrances
+  (`<Reveal>`), hover, and mount/unmount. GSAP, imported from `@/lib/gsap` and
+  run inside `useGSAP`, does anything tied to scroll position (scrub, pin,
+  parallax, a scrubbed video) and choreographed timelines; the `gsap-*` skills
+  cover its API. Never both on one element. Plain Tailwind / `tw-animate-css` is
   fine for simple transitions.
 - Path aliases (see `components.json`): `@/components`, `@/lib`,
   `@/components/ui`, `@/lib/utils`, `@/hooks`.
@@ -89,8 +92,8 @@ Prettier, and stripped from `prod`.
   - Scroll reveals use `<Reveal>`. Browser-surface theming (`::selection`, focus
     rings, scrollbars) goes in `globals.css`, never inline `style`.
   - Imagery: the client's assets first. Gaps come from Pexels through
-    `scripts/pexels.mjs`, which self-hosts each photo, embeds its origin, and
-    logs it in `clients/<slug>/stock-photos.md`. Its key,
+    `scripts/pexels.mjs`, which self-hosts each photo or video clip, embeds its
+    origin, and logs it in `clients/<slug>/stock-photos.md`. Its key,
     `PEXELS_SEARCH_API_KEY`, is a build-time key in `.env` / `.env.local`: never
     `NEXT_PUBLIC_`, never needed on Vercel. Anything else must be licensed for
     commercial use, saved into `public/images/` (never hotlinked), and flagged
@@ -144,9 +147,11 @@ Fill these in rather than recreating them:
 | `lib/constants.ts`                | `siteUrl`, `site` (name/phone/email/location), `routes`. No magic strings elsewhere.                                                                                                                       |
 | `lib/seo.ts`                      | `rootMetadata`, `buildPageMetadata()`, `businessJsonLd`, `buildFaqJsonLd()`. Pick the right schema.org subtype; **keep `formatDetection`** (it prevents an iOS-only hydration mismatch).                   |
 | `lib/validators.ts`               | Every zod schema, with `z.infer` types.                                                                                                                                                                    |
+| `lib/gsap.ts`                     | Registers GSAP's plugins once and exports `gsap`, `ScrollTrigger`, `useGSAP`, and `motionOk` (the reduced-motion gate for scroll effects). Import GSAP from here, never from `gsap`.                       |
 | `app/sitemap.ts`, `app/robots.ts` | Driven by `siteUrl` + `routes`. Prune to the routes you build.                                                                                                                                             |
 | `components/contact-form.tsx`     | Web3Forms reference implementation (above).                                                                                                                                                                |
 | `components/reveal.tsx`           | Scroll-reveal wrapper, paired with the `<noscript>` fallback in `app/layout.tsx`. **Don't use bare `whileInView` with `opacity: 0`** without that fallback — the section renders blank when JS is blocked. |
+| `components/motion-provider.tsx`  | Makes framer-motion honor `prefers-reduced-motion`; wraps the app in `app/layout.tsx`. Keep it.                                                                                                            |
 | `components/ui/`                  | shadcn: accordion, badge, button, card, form, input, label, separator, sheet, sonner, textarea.                                                                                                            |
 
 ## Never fabricate content

@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { MotionProvider } from "@/components/motion-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { rootMetadata, businessJsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -37,7 +38,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
         />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster />
       </body>
     </html>
