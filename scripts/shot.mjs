@@ -4,7 +4,9 @@
 //
 // Capture the production build (`npm run build && npm run start`); dev mode paints Next's dev
 // indicator into the shot. The page is scrolled top to bottom first: a full-page capture never
-// scrolls, so every <Reveal> below the fold would otherwise stay at opacity 0.
+// scrolls, so every <Reveal> below the fold would otherwise stay at opacity 0. It captures with
+// prefers-reduced-motion: reduce, so GSAP scroll effects (gated on `motionOk` in lib/gsap.ts)
+// show their static layout rather than the scroll-0 frame — an empty pin spacer, a scrub at 0%.
 //
 // Usage:
 //   node scripts/shot.mjs <url> <output.png> [width]
@@ -33,6 +35,7 @@ try {
     viewport: { width, height: mobile ? 844 : 900 },
     isMobile: mobile,
     hasTouch: mobile,
+    reducedMotion: "reduce",
   });
   await page.goto(url, { waitUntil: "load" });
   await page.evaluate(async () => {

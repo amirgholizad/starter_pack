@@ -64,19 +64,21 @@ Claude Code session.
 
 ## Scripts
 
-| Command                                           | What it does                                                                |
-| ------------------------------------------------- | --------------------------------------------------------------------------- |
-| `npm run dev`                                     | Start the dev server                                                        |
-| `npm run build`                                   | Production build (the build agent's success gate)                           |
-| `npm run start`                                   | Serve the production build                                                  |
-| `npm run lint`                                    | Run ESLint                                                                  |
-| `npm run format`                                  | Format with Prettier (`.prettierrc`)                                        |
-| `npm run format:check`                            | Verify formatting without writing                                           |
-| `scripts/snap.sh <url> <out.png>`                 | Screenshot an inspiration URL to a local PNG                                |
-| `node scripts/shot.mjs <url> <out.png> [width]`   | Full-page screenshot of a local page (reveals played) for the design review |
-| `python scripts/fetch-drive-assets.py <brief.md>` | Download a client's Drive assets (needs rclone)                             |
-| `node scripts/pexels.mjs search "<query>"`        | Search Pexels stock photos; renders a numbered contact sheet to pick from   |
-| `node scripts/pexels.mjs get <id> <out.jpg>`      | Self-host a Pexels photo with its origin embedded (`--log` records it)      |
+| Command                                            | What it does                                                                                |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `npm run dev`                                      | Start the dev server                                                                        |
+| `npm run build`                                    | Production build (the build agent's success gate)                                           |
+| `npm run start`                                    | Serve the production build                                                                  |
+| `npm run lint`                                     | Run ESLint                                                                                  |
+| `npm run format`                                   | Format with Prettier (`.prettierrc`)                                                        |
+| `npm run format:check`                             | Verify formatting without writing                                                           |
+| `scripts/snap.sh <url> <out.png>`                  | Screenshot an inspiration URL to a local PNG                                                |
+| `node scripts/shot.mjs <url> <out.png> [width]`    | Full-page screenshot of a local page (reveals played, reduced motion) for the design review |
+| `python scripts/fetch-drive-assets.py <brief.md>`  | Download a client's Drive assets (needs rclone)                                             |
+| `node scripts/pexels.mjs search "<query>"`         | Search Pexels stock photos; renders a numbered contact sheet to pick from                   |
+| `node scripts/pexels.mjs get <id> <out.jpg>`       | Self-host a Pexels photo with its origin embedded (`--log` records it)                      |
+| `node scripts/pexels.mjs search-video "<query>"`   | Search Pexels stock video; the contact sheet shows four frames per clip                     |
+| `node scripts/pexels.mjs get-video <id> <out.mp4>` | Self-host a Pexels clip plus its poster; `--scrub` encodes it for a GSAP scroll scrub       |
 
 Prettier owns `src/` and the root docs. The pipeline's own prompts and records
 (`.claude/`, `logs/`, `clients/`, `intake/`, and impeccable's `PRODUCT.md`,

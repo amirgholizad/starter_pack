@@ -106,13 +106,21 @@ your first UI edit. These pipeline bindings override new-work's defaults:
         — saves a self-hosted copy (never hotlink `images.pexels.com`), embeds its origin for
         impeccable's provenance scan, and logs it. Write the page's own alt text; the printed
         Pexels alt is only a starting point.
-   - **Stock is atmosphere, never evidence.** A stock photo may show the subject matter, setting,
-     or materials. It never stands in for the client's own people, premises, vehicles, products,
-     or results — no stock "our team", "our shop", portfolio, before/after, or testimonial
-     portraits. That is fabrication (`AGENTS.md` → *Never fabricate content*), and the Pexels
-     License forbids implying a pictured person endorses the business. Those slots wait for
-     client photos: omit them or give them a non-photographic treatment, and list them in the
-     summary.
+     3. **Video** (a scroll-scrubbed hero, a background loop) works the same way.
+        `node scripts/pexels.mjs search-video "<query>" --orientation landscape` prints a sheet
+        with four frames across each clip: pick one continuous camera move, no cuts, no text or
+        logos, and room for the copy. Then
+        `node scripts/pexels.mjs get-video <id> public/videos/stock/<slot>.mp4 --scrub --start <s> --duration <s> --log clients/<slug>/stock-photos.md`.
+        `--scrub` is for video GSAP drives from scroll; a background loop drops it and passes
+        `--width 1280`. Keep only the 5–8 s you need (busy footage costs ~0.5 MB a second). The
+        `<slot>.jpg` written beside it is the `poster` and the reduced-motion still.
+   - **Stock is atmosphere, never evidence.** A stock photo or clip may show the subject
+     matter, setting, or materials. It never stands in for the client's own people, premises,
+     vehicles, products, or results — no stock "our team", "our shop", portfolio,
+     before/after, or testimonial portraits. That is fabrication (`AGENTS.md` → *Never
+     fabricate content*), and the Pexels License forbids implying a pictured person endorses
+     the business. Those slots wait for client photos: omit them or give them a
+     non-photographic treatment, and list them in the summary.
    - **Bounded.** At most two distinct queries per slot. If neither sheet has a fit, drop the
      slot or go non-photographic rather than ship a weak photo — one decisive photo beats five
      mediocre ones. If §7 says no stock photography, skip Pexels. If the script fails on the key
@@ -126,12 +134,16 @@ your first UI edit. These pipeline bindings override new-work's defaults:
      `src/components/ui/` rather than hand-rolling one. `button` is already there.
    - **Server Components by default**; add `"use client"` only where interactivity requires it
      (the contact form, any client-side motion).
-   - **Motion:** `framer-motion` is installed (`import { motion } from "framer-motion"`) — use
-     it for the §4 animations (entrance/stagger, scroll reveal, hover); it needs `"use client"`.
-     For scroll reveal use the existing `<Reveal>` (`src/components/reveal.tsx`) rather than a
-     bare `whileInView` — it carries the `data-reveal` hook for the `<noscript>` fallback in
-     `layout.tsx`, without which the section renders blank when JS is blocked. Reach for plain
-     Tailwind / `tw-animate-css` on simple transitions. Keep motion tasteful, not gratuitous.
+   - **Motion** (rules: `web-conventions` → *Motion*). framer-motion does the §4 entrances,
+     hover, and mount/unmount; scroll reveals go through the existing `<Reveal>`
+     (`src/components/reveal.tsx`), never a bare `whileInView` — it carries the `data-reveal`
+     hook for the `<noscript>` fallback in `layout.tsx`, without which the section renders
+     blank when JS is blocked. GSAP (from `@/lib/gsap`, inside `useGSAP`; the `gsap-*` skills
+     for the API) does anything tied to scroll position — scrub, pin, parallax, a scrubbed
+     video — and choreographed timelines, always under `gsap.matchMedia()` with `motionOk`.
+     Never both libraries on one element, never a pin inside `<Reveal>`. Plain Tailwind /
+     `tw-animate-css` for simple transitions. Keep motion tasteful, not gratuitous: one
+     authored scroll moment beats a page of them.
    - **Real copy:** use the brief's content. Where copy is missing, use restrained placeholder
      text and note it in your summary. **Never invent testimonials, reviews, ratings, awards,
      or statistics** — see `AGENTS.md` → *Never fabricate content*. A testimonials section with
@@ -158,7 +170,7 @@ your first UI edit. These pipeline bindings override new-work's defaults:
      the Vercel production env) once the client's domain is purchased; until then every
      canonical, OG tag, sitemap entry, and JSON-LD URL points at the placeholder origin.
    - No fabricated reviews/awards/stats anywhere, and no stock photo posing as the client's own.
-   - `.claude/skills/impeccable/scripts/impeccable embed-prompt --scan public/images` reports
+   - `.claude/skills/impeccable/scripts/impeccable embed-prompt --scan public` reports
      nothing missing. Pexels downloads already carry their origin; for each client asset run
      `impeccable embed-prompt <file> --prompt "origin: client-supplied, clients/<slug>/assets/<name>"`.
    - `npm run format`, then `npm run format:check` clean.
@@ -169,7 +181,9 @@ your first UI edit. These pipeline bindings override new-work's defaults:
    **Capture for the finish review:** stop the dev server, run `npm run start`, then
    `node scripts/shot.mjs http://localhost:3000 .impeccable/review/desktop.png 1440` and the
    same at `mobile.png` / `390` (other routes: `desktop-<route>.png`, `mobile-<route>.png`).
-   Open every capture and confirm it shows the whole page, with no blank sections. If
+   Open every capture and confirm it shows the whole page, with no blank sections. Captures
+   run with reduced motion, so GSAP moments show their static layout there; scroll through
+   each one in the browser (Playwright MCP, at 1440 and 390 wide) to check the motion too. If
    `impeccable context` printed `MANUAL_DETECTOR_REQUIRED`, run
    `.claude/skills/impeccable/scripts/impeccable detect --json src` once and fix what's
    mechanical.
